@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>اقرأ — لوحة التحكم</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Segoe UI',Tahoma,sans-serif;background:#0f172a;color:#e2e8f0;min-height:100vh;padding:20px}
+h1{color:#FFD93D;font-size:1.5rem;margin-bottom:20px;text-align:center}
+.card{background:#1e293b;border-radius:16px;padding:20px;margin-bottom:16px;border:1px solid #334155}
+h2{color:#94a3b8;font-size:.9rem;font-weight:600;margin-bottom:12px;text-transform:uppercase;letter-spacing:.05em}
+input,select{width:100%;background:#0f172a;border:1px solid #334155;border-radius:8px;padding:10px 12px;color:#e2e8f0;font-size:.95rem;margin-bottom:10px;outline:none}
+input:focus,select:focus{border-color:#FFD93D}
+.btn{border:none;border-radius:8px;padding:12px 20px;font-size:.95rem;font-weight:700;cursor:pointer;width:100%;margin-bottom:8px}
+.btn-yellow{background:#FFD93D;color:#0f172a}
+.btn-green{background:#22c55e;color:#fff}
+.btn-red{background:#ef4444;color:#fff}
+.btn-gray{background:#334155;color:#e2e8f0}
+.code-badge{display:inline-block;background:#1e3a5f;border:2px solid #3b82f6;border-radius:8px;padding:8px 16px;font-size:1.3rem;font-weight:900;color:#60a5fa;letter-spacing:.15em;font-family:monospace}
+.list-item{background:#0f172a;border-radius:10px;padding:12px;margin-bottom:8px;border:1px solid #1e293b;display:flex;justify-content:space-between;align-items:center;gap:10px}
+.tag{display:inline-block;border-radius:99px;padding:2px 10px;font-size:.72rem;font-weight:700}
+.tag-active{background:#166534;color:#86efac}
+.tag-inactive{background:#7f1d1d;color:#fca5a5}
+#log{background:#0a0f1a;border-radius:8px;padding:12px;font-size:.82rem;color:#64748b;min-height:60px;font-family:monospace;white-space:pre-wrap;max-height:200px;overflow-y:auto}
+.copy-btn{background:#334155;border:none;border-radius:6px;padding:4px 10px;color:#94a3b8;cursor:pointer;font-size:.8rem}
+.flex{display:flex;gap:8px;align-items:center}
+.separator{border-top:1px solid #334155;margin:12px 0}
+#codes-list{max-height:300px;overflow-y:auto}
+.err{color:#fca5a5;font-size:.82rem;margin-bottom:8px;min-height:18px}
+#login-screen{max-width:380px;margin:60px auto 0}
+#app-screen{display:none}
+.topbar{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px}
+.user-chip{font-size:.78rem;color:#64748b}
+</style>
+</head>
+<body>
+
+<!-- ═══ شاشة تسجيل الدخول ═══ -->
+<div id="login-screen">
+  <h1>🌟 اقرأ — لوحة التحكم</h1>
+  <div class="card">
+    <h2>🔐 تسجيل الدخول</h2>
+    <input id="login-email" placeholder="البريد الإلكتروني" type="email" autocomplete="username"/>
+    <input id="login-pass" placeholder="كلمة السر" type="password" autocomplete="current-password"/>
+    <div class="err" id="login-err"></div>
+    <button class="btn btn-yellow" onclick="doLogin()">دخول</button>
+  </div>
+</div>
+
+<!-- ═══ التطبيق الفعلي (بعد تسجيل الدخول) ═══ -->
+<div id="app-screen">
+  <div class="topbar">
+    <h1 style="margin:0">🌟 اقرأ</h1>
+    <div class="flex">
+      <span class="user-chip" id="user-email"></span>
+      <button class="copy-btn" onclick="doLogout()">خروج</button>
+    </div>
+  </div>
+
+  <!-- إنشاء كود جديد -->
+  <div class="card">
+    <h2>➕ إنشاء كود جديد</h2>
+    <input id="family-name" placeholder="اسم العائلة (بالإنجليزي) مثل: AHMAD"/>
+    <input id="family-phone" placeholder="رقم الجوال"/>
+    <input id="family-notes" placeholder="ملاحظات (اختياري)"/>
+    <select id="product">
+      <option value="iqra_kg1">اقرأ KG1 — الحروف العربية</option>
+      <option value="iqra_all">اقرأ — كل المراحل</option>
+      <option value="iqra_math">اقرأ + الرياضيات</option>
+    </select>
+    <button class="btn btn-yellow" onclick="createCode()">⚡ إنشاء الكود</button>
+
+    <div id="new-code-result" style="display:none;margin-top:12px;text-align:center">
+      <div style="color:#94a3b8;font-size:.85rem;margin-bottom:8px">الكود الجديد:</div>
+      <div class="flex" style="justify-content:center;gap:10px">
+        <span class="code-badge" id="new-code-display"></span>
+        <button class="copy-btn" onclick="copyCode()">نسخ</button>
+      </div>
+      <div style="margin-top:10px">
+        <button class="btn btn-green" onclick="sendWhatsApp()" style="width:auto;padding:10px 20px">💬 إرسال عبر واتساب</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- قائمة الكودات -->
+  <div class="card">
+    <h2>📋 الكودات الحالية</h2>
+    <button class="btn btn-gray" onclick="loadCodes()">🔄 تحديث القائمة</button>
+    <div id="codes-list" style="margin-top:10px">
+      <div style="color:#64748b;text-align:center;padding:20px">اضغط تحديث لرؤية الكودات</div>
+    </div>
+  </div>
+
+  <!-- سجل العمليات -->
+  <div class="card">
+    <h2>📝 سجل العمليات</h2>
+    <div id="log">في انتظار العمليات...</div>
+  </div>
+</div>
+
+<!-- Firebase SDK (compat — يعمل بدون أدوات بناء) -->
+<script src="https://www.gstatic.com/firebasejs/10.13.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.13.1/firebase-auth-compat.js"></script>
+<script>
+var firebaseConfig={
+  apiKey:"AIzaSyAuht0nBKwwIjmLcKRa4loK_KzODB7UWpQ",
+  authDomain:"iqraa-app-7fbe5.firebaseapp.com",
+  projectId:"iqraa-app-7fbe5"
+};
+firebase.initializeApp(firebaseConfig);
+var auth=firebase.auth();
+
+var CONFIG={key:'AIzaSyAuht0nBKwwIjmLcKRa4loK_KzODB7UWpQ',project:'iqraa-app-7fbe5'};
+var currentCode='',currentPhone='';
+
+function log(msg){var el=document.getElementById('log');el.textContent=new Date().toLocaleTimeString()+' — '+msg+'\n'+el.textContent}
+
+/* ═══ تسجيل الدخول/الخروج ═══ */
+function doLogin(){
+  var email=document.getElementById('login-email').value.trim();
+  var pass=document.getElementById('login-pass').value;
+  var errEl=document.getElementById('login-err');
+  errEl.textContent='';
+  if(!email||!pass){errEl.textContent='أدخلي البريد وكلمة السر';return}
+  auth.signInWithEmailAndPassword(email,pass)
+    .catch(function(e){
+      errEl.textContent=e.code==='auth/invalid-credential'||e.code==='auth/wrong-password'||e.code==='auth/user-not-found'
+        ?'البريد أو كلمة السر غير صحيحة'
+        :'خطأ: '+e.message;
+    });
+}
+function doLogout(){auth.signOut()}
+
+auth.onAuthStateChanged(function(user){
+  if(user){
+    document.getElementById('login-screen').style.display='none';
+    document.getElementById('app-screen').style.display='block';
+    document.getElementById('user-email').textContent=user.email;
+    log('تم تسجيل الدخول: '+user.email);
+  }else{
+    document.getElementById('login-screen').style.display='block';
+    document.getElementById('app-screen').style.display='none';
+  }
+});
+
+/* ═══ إدارة الأكواد (نفس المنطق السابق) ═══ */
+function genCode(){
+  var name=document.getElementById('family-name').value.trim().toUpperCase().replace(/[^A-Z0-9]/g,'').slice(0,6);
+  if(!name){alert('أدخل اسم العائلة');return null}
+  var suffix=Math.floor(1000+Math.random()*9000).toString();
+  return (name+suffix).slice(0,10);
+}
+
+function createCode(){
+  var user=auth.currentUser;
+  if(!user){alert('سجلي الدخول أولاً');return}
+  var code=genCode();if(!code)return;
+  var phone=document.getElementById('family-phone').value.trim();
+  var notes=document.getElementById('family-notes').value.trim();
+  var product=document.getElementById('product').value;
+
+  log('إنشاء كود: '+code+' للمنتج: '+product);
+
+  user.getIdToken().then(function(idToken){
+    var body=JSON.stringify({fields:{
+      familyName:{stringValue:document.getElementById('family-name').value.trim()},
+      phone:{stringValue:phone},
+      notes:{stringValue:notes},
+      active:{booleanValue:true},
+      created:{stringValue:new Date().toISOString()},
+      products:{arrayValue:{values:[{stringValue:product}]}},
+      code:{stringValue:code}
+    }});
+
+    return fetch('https://firestore.googleapis.com/v1/projects/'+CONFIG.project+'/databases/(default)/documents/codes/'+code,{
+      method:'PATCH',
+      headers:{'Content-Type':'application/json','Authorization':'Bearer '+idToken},
+      body:body
+    });
+  })
+  .then(function(r){return r.json()})
+  .then(function(data){
+    if(data.name){
+      currentCode=code;currentPhone=phone;
+      document.getElementById('new-code-display').textContent=code;
+      document.getElementById('new-code-result').style.display='block';
+      log('✓ تم إنشاء الكود: '+code);
+      document.getElementById('family-name').value='';
+      document.getElementById('family-phone').value='';
+      document.getElementById('family-notes').value='';
+    }else{
+      log('✗ خطأ: '+JSON.stringify(data.error));
+    }
+  })
+  .catch(function(e){log('✗ خطأ في الاتصال: '+e.message)});
+}
+
+function copyCode(){
+  navigator.clipboard.writeText(currentCode).then(function(){log('تم نسخ الكود: '+currentCode)});
+}
+
+function sendWhatsApp(){
+  var msg='السلام عليكم! 🌟%0Aكود تفعيل تطبيق اقرأ:%0A%0A*'+currentCode+'*%0A%0Aخطوات التفعيل:%0A1. افتح التطبيق%0A2. اضغط "عندي كود تفعيل"%0A3. أدخل الكود%0A4. استمتع بكل المغامرات! 🎉%0A%0Aشكراً لثقتكم بنا 💙';
+  var phone=currentPhone.replace(/[^0-9+]/g,'').replace('+','');
+  if(!phone){alert('أدخل رقم الجوال أولاً');return}
+  window.open('https://wa.me/'+phone+'?text='+msg,'_blank');
+}
+
+function loadCodes(){
+  log('تحميل الكودات...');
+  /* القراءة عامة (allow read:true) - لا تحتاج توكن */
+  fetch('https://firestore.googleapis.com/v1/projects/'+CONFIG.project+'/databases/(default)/documents/codes?key='+CONFIG.key)
+  .then(function(r){return r.json()})
+  .then(function(data){
+    var list=document.getElementById('codes-list');
+    if(!data.documents||data.documents.length===0){
+      list.innerHTML='<div style="color:#64748b;text-align:center;padding:20px">لا توجد كودات بعد</div>';
+      log('لا توجد كودات');return;
+    }
+    list.innerHTML='';
+    data.documents.forEach(function(doc){
+      var f=doc.fields||{};
+      var code=doc.name.split('/').pop();
+      var active=f.active&&f.active.booleanValue;
+      var family=f.familyName&&f.familyName.stringValue||'—';
+      var phone=f.phone&&f.phone.stringValue||'';
+      var products=f.products&&f.products.arrayValue&&f.products.arrayValue.values||[];
+      var plist=products.map(function(p){return p.stringValue}).join(', ')||'—';
+      var item=document.createElement('div');item.className='list-item';
+      item.innerHTML='<div style="flex:1">'
+        +'<div style="font-weight:700;color:#e2e8f0">'+family+'</div>'
+        +'<div style="font-family:monospace;color:#60a5fa;font-size:.85rem">'+code+'</div>'
+        +'<div style="font-size:.75rem;color:#64748b">'+plist+'</div>'
+        +'</div>'
+        +'<div style="display:flex;flex-direction:column;gap:4px;align-items:flex-end">'
+        +'<span class="tag '+(active?'tag-active':'tag-inactive')+'">'+(active?'فعّال':'موقوف')+'</span>'
+        +'<button class="copy-btn" onclick="toggleCode(\''+code+'\','+active+')">'+(!active?'تفعيل':'إيقاف')+'</button>'
+        +(phone?'<button class="copy-btn" onclick="window.open(\'https://wa.me/'+phone.replace(/[^0-9]/g,'')+'\')">💬</button>':'')
+        +'</div>';
+      list.appendChild(item);
+    });
+    log('تم تحميل '+data.documents.length+' كود');
+  })
+  .catch(function(e){log('✗ خطأ: '+e.message)});
+}
+
+function toggleCode(code,currentActive){
+  var user=auth.currentUser;
+  if(!user){alert('سجلي الدخول أولاً');return}
+  var newActive=!currentActive;
+  user.getIdToken().then(function(idToken){
+    return fetch('https://firestore.googleapis.com/v1/projects/'+CONFIG.project+'/databases/(default)/documents/codes/'+code+'?updateMask.fieldPaths=active',{
+      method:'PATCH',
+      headers:{'Content-Type':'application/json','Authorization':'Bearer '+idToken},
+      body:JSON.stringify({fields:{active:{booleanValue:newActive}}})
+    });
+  })
+  .then(function(){log((newActive?'تفعيل':'إيقاف')+' الكود: '+code);loadCodes()})
+  .catch(function(e){log('✗ خطأ: '+e.message)});
+}
+</script>
+</body>
+</html>
