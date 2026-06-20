@@ -1,0 +1,488 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>اقرأ — لوحة التحكم</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Segoe UI',Tahoma,sans-serif;background:#0f172a;color:#e2e8f0;min-height:100vh;padding:20px}
+h1{color:#FFD93D;font-size:1.5rem;margin-bottom:20px;text-align:center}
+.card{background:#1e293b;border-radius:16px;padding:20px;margin-bottom:16px;border:1px solid #334155}
+h2{color:#94a3b8;font-size:.9rem;font-weight:600;margin-bottom:12px;text-transform:uppercase;letter-spacing:.05em}
+input,select{width:100%;background:#0f172a;border:1px solid #334155;border-radius:8px;padding:10px 12px;color:#e2e8f0;font-size:.95rem;margin-bottom:10px;outline:none}
+input:focus,select:focus{border-color:#FFD93D}
+.btn{border:none;border-radius:8px;padding:12px 20px;font-size:.95rem;font-weight:700;cursor:pointer;width:100%;margin-bottom:8px}
+.btn-yellow{background:#FFD93D;color:#0f172a}
+.btn-green{background:#22c55e;color:#fff}
+.btn-red{background:#ef4444;color:#fff}
+.btn-gray{background:#334155;color:#e2e8f0}
+.code-badge{display:inline-block;background:#1e3a5f;border:2px solid #3b82f6;border-radius:8px;padding:8px 16px;font-size:1.3rem;font-weight:900;color:#60a5fa;letter-spacing:.15em;font-family:monospace}
+.list-item{background:#0f172a;border-radius:10px;padding:12px;margin-bottom:8px;border:1px solid #1e293b;display:flex;justify-content:space-between;align-items:center;gap:10px}
+.tag{display:inline-block;border-radius:99px;padding:2px 10px;font-size:.72rem;font-weight:700}
+.tag-active{background:#166534;color:#86efac}
+.tag-inactive{background:#7f1d1d;color:#fca5a5}
+#log{background:#0a0f1a;border-radius:8px;padding:12px;font-size:.82rem;color:#64748b;min-height:60px;font-family:monospace;white-space:pre-wrap;max-height:200px;overflow-y:auto}
+.copy-btn{background:#334155;border:none;border-radius:6px;padding:4px 10px;color:#94a3b8;cursor:pointer;font-size:.8rem}
+.flex{display:flex;gap:8px;align-items:center}
+.separator{border-top:1px solid #334155;margin:12px 0}
+#codes-list{max-height:300px;overflow-y:auto}
+.err{color:#fca5a5;font-size:.82rem;margin-bottom:8px;min-height:18px}
+#login-screen{max-width:380px;margin:60px auto 0}
+#app-screen{display:none}
+.topbar{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px}
+.user-chip{font-size:.78rem;color:#64748b}
+.dot{display:inline-block;width:9px;height:9px;border-radius:50%;flex-shrink:0}
+.dot-green{background:#22c55e}
+.dot-yellow{background:#eab308}
+.dot-red{background:#ef4444}
+.dot-gray{background:#475569}
+.prog-bar-bg{background:#0a0f1a;border-radius:99px;height:7px;overflow:hidden;margin-top:6px}
+.prog-bar-fg{height:100%;border-radius:99px;background:linear-gradient(90deg,#22c55e,#FFD93D)}
+.detail-btn{background:#1e3a5f;color:#60a5fa;border:1px solid #2563eb;border-radius:6px;padding:4px 10px;font-size:.75rem;cursor:pointer}
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:999;padding:20px;overflow-y:auto}
+.modal-overlay.show{display:block}
+.modal-box{background:#1e293b;border-radius:16px;padding:20px;max-width:480px;margin:20px auto;border:1px solid #334155}
+.modal-close{float:left;background:#334155;border:none;color:#e2e8f0;border-radius:8px;padding:6px 12px;cursor:pointer;font-size:.85rem}
+.letter-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:6px;margin-top:10px}
+.letter-cell{aspect-ratio:1;border-radius:10px;display:flex;flex-direction:column;align-items:center;justify-content:center;font-size:1.1rem;border:2px solid transparent}
+.letter-cell.lc-done{background:#166534;border-color:#22c55e}
+.letter-cell.lc-miss{background:#7f1d1d;border-color:#ef4444}
+.letter-cell.lc-todo{background:#0f172a;border-color:#334155;opacity:.5}
+.world-chip{display:inline-block;background:#0f172a;border:1px solid #334155;border-radius:99px;padding:3px 10px;font-size:.72rem;margin:2px;color:#94a3b8}
+.world-chip.wc-done{border-color:#22c55e;color:#86efac}
+.stat-row{display:flex;gap:8px;margin:10px 0}
+.stat-box{flex:1;background:#0f172a;border-radius:10px;padding:10px;text-align:center}
+.stat-box .v{font-size:1.2rem;font-weight:900;color:#FFD93D}
+.stat-box .l{font-size:.7rem;color:#64748b}
+.miss-item{display:flex;justify-content:space-between;background:#0f172a;border-radius:8px;padding:6px 10px;margin-bottom:5px;font-size:.85rem}
+.empty-note{color:#64748b;text-align:center;padding:14px;font-size:.85rem}
+</style>
+</head>
+<body>
+
+<!-- ═══ شاشة تسجيل الدخول ═══ -->
+<div id="login-screen">
+  <h1>🌟 اقرأ — لوحة التحكم</h1>
+  <div class="card">
+    <h2>🔐 تسجيل الدخول</h2>
+    <input id="login-email" placeholder="البريد الإلكتروني" type="email" autocomplete="username"/>
+    <input id="login-pass" placeholder="كلمة السر" type="password" autocomplete="current-password"/>
+    <div class="err" id="login-err"></div>
+    <button class="btn btn-yellow" onclick="doLogin()">دخول</button>
+  </div>
+</div>
+
+<!-- ═══ التطبيق الفعلي (بعد تسجيل الدخول) ═══ -->
+<div id="app-screen">
+  <div class="topbar">
+    <h1 style="margin:0">🌟 اقرأ</h1>
+    <div class="flex">
+      <span class="user-chip" id="user-email"></span>
+      <button class="copy-btn" onclick="doLogout()">خروج</button>
+    </div>
+  </div>
+
+  <!-- إنشاء كود جديد -->
+  <div class="card">
+    <h2>➕ إنشاء كود جديد</h2>
+    <input id="family-name" placeholder="اسم العائلة (بالإنجليزي) مثل: AHMAD"/>
+    <input id="family-phone" placeholder="رقم الجوال"/>
+    <input id="family-notes" placeholder="ملاحظات (اختياري)"/>
+    <select id="product">
+      <option value="iqra_kg1">اقرأ KG1 — الحروف العربية</option>
+      <option value="iqra_all">اقرأ — كل المراحل</option>
+      <option value="iqra_math">اقرأ + الرياضيات</option>
+    </select>
+    <button class="btn btn-yellow" onclick="createCode()">⚡ إنشاء الكود</button>
+
+    <div id="new-code-result" style="display:none;margin-top:12px;text-align:center">
+      <div style="color:#94a3b8;font-size:.85rem;margin-bottom:8px">الكود الجديد:</div>
+      <div class="flex" style="justify-content:center;gap:10px">
+        <span class="code-badge" id="new-code-display"></span>
+        <button class="copy-btn" onclick="copyCode()">نسخ</button>
+      </div>
+      <div style="margin-top:10px">
+        <button class="btn btn-green" onclick="sendWhatsApp()" style="width:auto;padding:10px 20px">💬 إرسال عبر واتساب</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- قائمة الكودات -->
+  <div class="card">
+    <h2>📋 الكودات الحالية</h2>
+    <button class="btn btn-gray" onclick="loadCodes()">🔄 تحديث القائمة</button>
+    <div id="codes-list" style="margin-top:10px">
+      <div style="color:#64748b;text-align:center;padding:20px">اضغط تحديث لرؤية الكودات</div>
+    </div>
+  </div>
+
+  <!-- سجل العمليات -->
+  <div class="card">
+    <h2>📝 سجل العمليات</h2>
+    <div id="log">في انتظار العمليات...</div>
+  </div>
+</div>
+
+<!-- ═══ نافذة تفاصيل التقدّم ═══ -->
+<div class="modal-overlay" id="progress-modal">
+  <div class="modal-box">
+    <button class="modal-close" onclick="closeProgressModal()">✕ إغلاق</button>
+    <div style="clear:both"></div>
+    <h2 id="pm-title" style="margin-top:14px">📊 تقدّم الطفل</h2>
+    <div id="pm-body"><div class="empty-note">جاري التحميل...</div></div>
+  </div>
+</div>
+
+<!-- Firebase SDK (compat — يعمل بدون أدوات بناء) -->
+<script src="https://www.gstatic.com/firebasejs/10.13.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.13.1/firebase-auth-compat.js"></script>
+<script>
+var firebaseConfig={
+  apiKey:"AIzaSyAuht0nBKwwIjmLcKRa4loK_KzODB7UWpQ",
+  authDomain:"iqraa-app-7fbe5.firebaseapp.com",
+  projectId:"iqraa-app-7fbe5"
+};
+firebase.initializeApp(firebaseConfig);
+var auth=firebase.auth();
+
+var CONFIG={key:'AIzaSyAuht0nBKwwIjmLcKRa4loK_KzODB7UWpQ',project:'iqraa-app-7fbe5'};
+var currentCode='',currentPhone='';
+
+var ALL_LETTERS=[
+ {wid:'garden',wn:'\u062D\u062F\u064A\u0642\u0629 \u0627\u0644\u0628\u062F\u0627\u064A\u0627\u062A',id:'alef',ar:'\u0627',nm:'\u0623\u0644\u0641',em:'\uD83E\uDD81'},
+ {wid:'garden',wn:'\u062D\u062F\u064A\u0642\u0629 \u0627\u0644\u0628\u062F\u0627\u064A\u0627\u062A',id:'lam',ar:'\u0644',nm:'\u0644\u0627\u0645',em:'\uD83C\uDF4B'},
+ {wid:'garden',wn:'\u062D\u062F\u064A\u0642\u0629 \u0627\u0644\u0628\u062F\u0627\u064A\u0627\u062A',id:'meem',ar:'\u0645',nm:'\u0645\u064A\u0645',em:'\uD83C\uDF4C'},
+ {wid:'garden',wn:'\u062D\u062F\u064A\u0642\u0629 \u0627\u0644\u0628\u062F\u0627\u064A\u0627\u062A',id:'ba',ar:'\u0628',nm:'\u0628\u0627\u0621',em:'\uD83E\uDD86'},
+ {wid:'garden',wn:'\u062D\u062F\u064A\u0642\u0629 \u0627\u0644\u0628\u062F\u0627\u064A\u0627\u062A',id:'noon',ar:'\u0646',nm:'\u0646\u0648\u0646',em:'\uD83D\uDC1D'},
+ {wid:'arcs',wn:'\u062C\u0632\u064A\u0631\u0629 \u0627\u0644\u0623\u0642\u0648\u0627\u0633',id:'ta',ar:'\u062A',nm:'\u062A\u0627\u0621',em:'\uD83C\uDF4E'},
+ {wid:'arcs',wn:'\u062C\u0632\u064A\u0631\u0629 \u0627\u0644\u0623\u0642\u0648\u0627\u0633',id:'tha',ar:'\u062B',nm:'\u062B\u0627\u0621',em:'\uD83E\uDD8A'},
+ {wid:'arcs',wn:'\u062C\u0632\u064A\u0631\u0629 \u0627\u0644\u0623\u0642\u0648\u0627\u0633',id:'ya',ar:'\u064A',nm:'\u064A\u0627\u0621',em:'\uD83D\uDD90\uFE0F'},
+ {wid:'arcs',wn:'\u062C\u0632\u064A\u0631\u0629 \u0627\u0644\u0623\u0642\u0648\u0627\u0633',id:'kaf',ar:'\u0643',nm:'\u0643\u0627\u0641',em:'\uD83D\uDC15'},
+ {wid:'arcs',wn:'\u062C\u0632\u064A\u0631\u0629 \u0627\u0644\u0623\u0642\u0648\u0627\u0633',id:'fa',ar:'\u0641',nm:'\u0641\u0627\u0621',em:'\uD83E\uDD8B'},
+ {wid:'beach',wn:'\u0634\u0627\u0637\u0626 \u0627\u0644\u0623\u0633\u0646\u0627\u0646',id:'seen',ar:'\u0633',nm:'\u0633\u064A\u0646',em:'\uD83D\uDC1F'},
+ {wid:'beach',wn:'\u0634\u0627\u0637\u0626 \u0627\u0644\u0623\u0633\u0646\u0627\u0646',id:'sheen',ar:'\u0634',nm:'\u0634\u064A\u0646',em:'\uD83C\uDF1E'},
+ {wid:'beach',wn:'\u0634\u0627\u0637\u0626 \u0627\u0644\u0623\u0633\u0646\u0627\u0646',id:'sad',ar:'\u0635',nm:'\u0635\u0627\u062F',em:'\uD83C\uDF5A'},
+ {wid:'beach',wn:'\u0634\u0627\u0637\u0626 \u0627\u0644\u0623\u0633\u0646\u0627\u0646',id:'dad',ar:'\u0636',nm:'\u0636\u0627\u062F',em:'\uD83C\uDF3F'},
+ {wid:'valley',wn:'\u0648\u0627\u062F\u064A \u0627\u0644\u0645\u0646\u0639\u0637\u0641\u0627\u062A',id:'ra',ar:'\u0631',nm:'\u0631\u0627\u0621',em:'\uD83C\uDF39'},
+ {wid:'valley',wn:'\u0648\u0627\u062F\u064A \u0627\u0644\u0645\u0646\u0639\u0637\u0641\u0627\u062A',id:'zay',ar:'\u0632',nm:'\u0632\u0627\u064A',em:'\uD83C\uDF37'},
+ {wid:'valley',wn:'\u0648\u0627\u062F\u064A \u0627\u0644\u0645\u0646\u0639\u0637\u0641\u0627\u062A',id:'dal',ar:'\u062F',nm:'\u062F\u0627\u0644',em:'\uD83D\uDC3B'},
+ {wid:'valley',wn:'\u0648\u0627\u062F\u064A \u0627\u0644\u0645\u0646\u0639\u0637\u0641\u0627\u062A',id:'thal',ar:'\u0630',nm:'\u0630\u0627\u0644',em:'\uD83D\uDC3A'},
+ {wid:'valley',wn:'\u0648\u0627\u062F\u064A \u0627\u0644\u0645\u0646\u0639\u0637\u0641\u0627\u062A',id:'waw',ar:'\u0648',nm:'\u0648\u0627\u0648',em:'\uD83C\uDF39'},
+ {wid:'city',wn:'\u0645\u062F\u064A\u0646\u0629 \u0627\u0644\u062D\u0644\u0642\u0627\u062A',id:'jeem',ar:'\u062C',nm:'\u062C\u064A\u0645',em:'\uD83D\uDC2B'},
+ {wid:'city',wn:'\u0645\u062F\u064A\u0646\u0629 \u0627\u0644\u062D\u0644\u0642\u0627\u062A',id:'ha',ar:'\u062D',nm:'\u062D\u0627\u0621',em:'\uD83D\uDC34'},
+ {wid:'city',wn:'\u0645\u062F\u064A\u0646\u0629 \u0627\u0644\u062D\u0644\u0642\u0627\u062A',id:'kha',ar:'\u062E',nm:'\u062E\u0627\u0621',em:'\uD83E\uDD53'},
+ {wid:'city',wn:'\u0645\u062F\u064A\u0646\u0629 \u0627\u0644\u062D\u0644\u0642\u0627\u062A',id:'heh',ar:'\u0647',nm:'\u0647\u0627\u0621',em:'\uD83C\uDFE0'},
+ {wid:'city',wn:'\u0645\u062F\u064A\u0646\u0629 \u0627\u0644\u062D\u0644\u0642\u0627\u062A',id:'ta_marb',ar:'\u0629',nm:'\u062A\u0627\u0621 \u0645\u0631\u0628\u0648\u0637\u0629',em:'\uD83C\uDF3A'},
+ {wid:'castle',wn:'\u0642\u0644\u0639\u0629 \u0627\u0644\u062D\u0631\u0648\u0641 \u0627\u0644\u0630\u0647\u0628\u064A\u0629',id:'ayn',ar:'\u0639',nm:'\u0639\u064A\u0646',em:'\uD83D\uDC26'},
+ {wid:'castle',wn:'\u0642\u0644\u0639\u0629 \u0627\u0644\u062D\u0631\u0648\u0641 \u0627\u0644\u0630\u0647\u0628\u064A\u0629',id:'ghayn',ar:'\u063A',nm:'\u063A\u064A\u0646',em:'\uD83E\uDD85'},
+ {wid:'castle',wn:'\u0642\u0644\u0639\u0629 \u0627\u0644\u062D\u0631\u0648\u0641 \u0627\u0644\u0630\u0647\u0628\u064A\u0629',id:'qaf',ar:'\u0642',nm:'\u0642\u0627\u0641',em:'\uD83D\uDC31'},
+ {wid:'castle',wn:'\u0642\u0644\u0639\u0629 \u0627\u0644\u062D\u0631\u0648\u0641 \u0627\u0644\u0630\u0647\u0628\u064A\u0629',id:'ta2',ar:'\u0637',nm:'\u0637\u0627\u0621',em:'\uD83D\uDC9A'},
+ {wid:'castle',wn:'\u0642\u0644\u0639\u0629 \u0627\u0644\u062D\u0631\u0648\u0641 \u0627\u0644\u0630\u0647\u0628\u064A\u0629',id:'dha',ar:'\u0638',nm:'\u0638\u0627\u0621',em:'\uD83E\uDD8C'},
+ {wid:'sky',wn:'\u0633\u0645\u0627\u0621 \u0627\u0644\u0646\u062C\u0648\u0645',id:'hamza',ar:'\u0621',nm:'\u0647\u0645\u0632\u0629',em:'\uD83D\uDEF8'},
+ {wid:'sky',wn:'\u0633\u0645\u0627\u0621 \u0627\u0644\u0646\u062C\u0648\u0645',id:'alef_maqsura',ar:'\u0649',nm:'\u0623\u0644\u0641 \u0645\u0642\u0635\u0648\u0631\u0629',em:'\uD83D\uDD11'},
+ {wid:'hamzat',wn:'\u0645\u0645\u0644\u0643\u0629 \u0627\u0644\u0647\u0645\u0632\u0627\u062A',id:'alef_hamza_above',ar:'\u0623',nm:'\u0623\u0644\u0641 \u0628\u0647\u0645\u0632\u0629 \u0641\u0648\u0642',em:'\uD83E\uDD81'},
+ {wid:'hamzat',wn:'\u0645\u0645\u0644\u0643\u0629 \u0627\u0644\u0647\u0645\u0632\u0627\u062A',id:'alef_hamza_below',ar:'\u0625',nm:'\u0623\u0644\u0641 \u0628\u0647\u0645\u0632\u0629 \u062A\u062D\u062A',em:'\uD83D\uDC18'},
+ {wid:'hamzat',wn:'\u0645\u0645\u0644\u0643\u0629 \u0627\u0644\u0647\u0645\u0632\u0627\u062A',id:'waw_hamza',ar:'\u0624',nm:'\u0648\u0627\u0648 \u0628\u0647\u0645\u0632\u0629',em:'\uD83E\uDE9E'},
+ {wid:'hamzat',wn:'\u0645\u0645\u0644\u0643\u0629 \u0627\u0644\u0647\u0645\u0632\u0627\u062A',id:'ya_hamza',ar:'\u0626',nm:'\u064A\u0627\u0621 \u0628\u0647\u0645\u0632\u0629',em:'\uD83D\uDCD6'}
+];
+var WORLD_ORDER=['garden','arcs','beach','valley','city','castle','sky','hamzat'];
+var PROGRESS_CACHE={};
+
+function log(msg){var el=document.getElementById('log');el.textContent=new Date().toLocaleTimeString()+' — '+msg+'\n'+el.textContent}
+
+/* ═══ تسجيل الدخول/الخروج ═══ */
+function doLogin(){
+  var email=document.getElementById('login-email').value.trim();
+  var pass=document.getElementById('login-pass').value;
+  var errEl=document.getElementById('login-err');
+  errEl.textContent='';
+  if(!email||!pass){errEl.textContent='أدخلي البريد وكلمة السر';return}
+  auth.signInWithEmailAndPassword(email,pass)
+    .catch(function(e){
+      errEl.textContent=e.code==='auth/invalid-credential'||e.code==='auth/wrong-password'||e.code==='auth/user-not-found'
+        ?'البريد أو كلمة السر غير صحيحة'
+        :'خطأ: '+e.message;
+    });
+}
+function doLogout(){auth.signOut()}
+
+auth.onAuthStateChanged(function(user){
+  if(user){
+    document.getElementById('login-screen').style.display='none';
+    document.getElementById('app-screen').style.display='block';
+    document.getElementById('user-email').textContent=user.email;
+    log('تم تسجيل الدخول: '+user.email);
+  }else{
+    document.getElementById('login-screen').style.display='block';
+    document.getElementById('app-screen').style.display='none';
+  }
+});
+
+/* ═══ إدارة الأكواد (نفس المنطق السابق) ═══ */
+function genCode(){
+  var name=document.getElementById('family-name').value.trim().toUpperCase().replace(/[^A-Z0-9]/g,'').slice(0,6);
+  if(!name){alert('أدخل اسم العائلة');return null}
+  var suffix=Math.floor(1000+Math.random()*9000).toString();
+  return (name+suffix).slice(0,10);
+}
+
+function createCode(){
+  var user=auth.currentUser;
+  if(!user){alert('سجلي الدخول أولاً');return}
+  var code=genCode();if(!code)return;
+  var phone=document.getElementById('family-phone').value.trim();
+  var notes=document.getElementById('family-notes').value.trim();
+  var product=document.getElementById('product').value;
+
+  log('إنشاء كود: '+code+' للمنتج: '+product);
+
+  user.getIdToken().then(function(idToken){
+    var body=JSON.stringify({fields:{
+      familyName:{stringValue:document.getElementById('family-name').value.trim()},
+      phone:{stringValue:phone},
+      notes:{stringValue:notes},
+      active:{booleanValue:true},
+      created:{stringValue:new Date().toISOString()},
+      products:{arrayValue:{values:[{stringValue:product}]}},
+      code:{stringValue:code}
+    }});
+
+    return fetch('https://firestore.googleapis.com/v1/projects/'+CONFIG.project+'/databases/(default)/documents/codes/'+code,{
+      method:'PATCH',
+      headers:{'Content-Type':'application/json','Authorization':'Bearer '+idToken},
+      body:body
+    });
+  })
+  .then(function(r){return r.json()})
+  .then(function(data){
+    if(data.name){
+      currentCode=code;currentPhone=phone;
+      document.getElementById('new-code-display').textContent=code;
+      document.getElementById('new-code-result').style.display='block';
+      log('✓ تم إنشاء الكود: '+code);
+      document.getElementById('family-name').value='';
+      document.getElementById('family-phone').value='';
+      document.getElementById('family-notes').value='';
+    }else{
+      log('✗ خطأ: '+JSON.stringify(data.error));
+    }
+  })
+  .catch(function(e){log('✗ خطأ في الاتصال: '+e.message)});
+}
+
+function copyCode(){
+  navigator.clipboard.writeText(currentCode).then(function(){log('تم نسخ الكود: '+currentCode)});
+}
+
+function sendWhatsApp(){
+  var msg='السلام عليكم! 🌟%0Aكود تفعيل تطبيق اقرأ:%0A%0A*'+currentCode+'*%0A%0Aخطوات التفعيل:%0A1. افتح التطبيق%0A2. اضغط "عندي كود تفعيل"%0A3. أدخل الكود%0A4. استمتع بكل المغامرات! 🎉%0A%0Aشكراً لثقتكم بنا 💙';
+  var phone=currentPhone.replace(/[^0-9+]/g,'').replace('+','');
+  if(!phone){alert('أدخل رقم الجوال أولاً');return}
+  window.open('https://wa.me/'+phone+'?text='+msg,'_blank');
+}
+
+function loadCodes(){
+  log('تحميل الكودات...');
+  /* القراءة عامة (allow read:true) - لا تحتاج توكن */
+  fetch('https://firestore.googleapis.com/v1/projects/'+CONFIG.project+'/databases/(default)/documents/codes?key='+CONFIG.key)
+  .then(function(r){return r.json()})
+  .then(function(data){
+    var list=document.getElementById('codes-list');
+    if(!data.documents||data.documents.length===0){
+      list.innerHTML='<div style="color:#64748b;text-align:center;padding:20px">لا توجد كودات بعد</div>';
+      log('لا توجد كودات');return;
+    }
+    list.innerHTML='';
+    var user=auth.currentUser;
+    var idTokenPromise=user?user.getIdToken():Promise.resolve(null);
+    idTokenPromise.then(function(idToken){
+      var codes=data.documents.map(function(doc){return doc.name.split('/').pop()});
+      fetchAllProgress(codes,idToken).then(function(progMap){
+        PROGRESS_CACHE=progMap;
+        data.documents.forEach(function(doc){
+          var f=doc.fields||{};
+          var code=doc.name.split('/').pop();
+          var active=f.active&&f.active.booleanValue;
+          var family=f.familyName&&f.familyName.stringValue||'—';
+          var phone=f.phone&&f.phone.stringValue||'';
+          var products=f.products&&f.products.arrayValue&&f.products.arrayValue.values||[];
+          var plist=products.map(function(p){return p.stringValue}).join(', ')||'—';
+          var prog=progMap[code];
+          var item=document.createElement('div');item.className='list-item';
+          item.style.flexDirection='column';item.style.alignItems='stretch';
+          var topRow=document.createElement('div');
+          topRow.style.cssText='display:flex;justify-content:space-between;align-items:center;gap:10px;width:100%';
+          topRow.innerHTML='<div style="flex:1">'
+            +'<div style="font-weight:700;color:#e2e8f0">'+family+'</div>'
+            +'<div style="font-family:monospace;color:#60a5fa;font-size:.85rem">'+code+'</div>'
+            +'<div style="font-size:.75rem;color:#64748b">'+plist+'</div>'
+            +'</div>'
+            +'<div style="display:flex;flex-direction:column;gap:4px;align-items:flex-end">'
+            +'<span class="tag '+(active?'tag-active':'tag-inactive')+'">'+(active?'فعّال':'موقوف')+'</span>'
+            +'<button class="copy-btn" onclick="toggleCode(\''+code+'\','+active+')">'+(!active?'تفعيل':'إيقاف')+'</button>'
+            +(phone?'<button class="copy-btn" onclick="window.open(\'https://wa.me/'+phone.replace(/[^0-9]/g,'')+'\')">💬</button>':'')
+            +'</div>';
+          item.appendChild(topRow);
+          item.appendChild(buildProgressStrip(code,prog));
+          list.appendChild(item);
+        });
+        log('تم تحميل '+data.documents.length+' كود');
+      });
+    });
+  })
+  .catch(function(e){log('✗ خطأ: '+e.message)});
+}
+
+function fetchAllProgress(codes,idToken){
+  if(!idToken){return Promise.resolve({})}
+  var headers={'Authorization':'Bearer '+idToken};
+  return Promise.all(codes.map(function(code){
+    return fetch('https://firestore.googleapis.com/v1/projects/'+CONFIG.project+'/databases/(default)/documents/progress/'+code,{headers:headers})
+      .then(function(r){return r.ok?r.json():null})
+      .then(function(d){return {code:code,data:d}})
+      .catch(function(){return {code:code,data:null}});
+  })).then(function(results){
+    var map={};
+    results.forEach(function(r){map[r.code]=r.data&&r.data.fields?r.data.fields:null});
+    return map;
+  });
+}
+
+function parseProgressFields(f){
+  if(!f)return null;
+  var done=(f.done&&f.done.arrayValue&&f.done.arrayValue.values||[]).map(function(v){return v.stringValue});
+  var worldsDone=(f.worldsDone&&f.worldsDone.arrayValue&&f.worldsDone.arrayValue.values||[]).map(function(v){return parseInt(v.integerValue||0)});
+  var letterMiss={};
+  var missFields=f.letterMiss&&f.letterMiss.mapValue&&f.letterMiss.mapValue.fields||{};
+  for(var k in missFields){letterMiss[k]=parseInt(missFields[k].integerValue||0)}
+  return{
+    name:f.name&&f.name.stringValue||'',
+    stars:parseInt(f.stars&&f.stars.integerValue||0),
+    gems:parseInt(f.gems&&f.gems.integerValue||0),
+    doneCount:parseInt(f.doneCount&&f.doneCount.integerValue||0),
+    totalLetters:parseInt(f.totalLetters&&f.totalLetters.integerValue||35),
+    done:done,
+    worldsDone:worldsDone,
+    letterMiss:letterMiss,
+    lastActive:f.lastActive&&f.lastActive.stringValue||null
+  };
+}
+
+function activityStatus(lastActive){
+  if(!lastActive)return{dot:'dot-gray',label:'لم يبدأ بعد'};
+  var days=(Date.now()-new Date(lastActive).getTime())/86400000;
+  if(days<2)return{dot:'dot-green',label:'نشط الآن'};
+  if(days<7)return{dot:'dot-yellow',label:'نشط هذا الأسبوع'};
+  if(days<14)return{dot:'dot-yellow',label:'متباطئ'};
+  return{dot:'dot-red',label:'متوقف منذ '+Math.floor(days)+' يوم'};
+}
+
+function buildProgressStrip(code,fields){
+  var wrap=document.createElement('div');
+  wrap.style.cssText='margin-top:8px;padding-top:8px;border-top:1px solid #1e293b';
+  var p=parseProgressFields(fields);
+  if(!p){
+    wrap.innerHTML='<div style="display:flex;align-items:center;gap:6px;font-size:.78rem;color:#64748b"><span class="dot dot-gray"></span> لم يبدأ اللعب بعد</div>';
+    return wrap;
+  }
+  var pct=Math.round((p.doneCount/p.totalLetters)*100)||0;
+  var st=activityStatus(p.lastActive);
+  var row=document.createElement('div');
+  row.style.cssText='display:flex;justify-content:space-between;align-items:center;gap:8px';
+  row.innerHTML='<div style="display:flex;align-items:center;gap:6px;font-size:.78rem;color:#94a3b8">'
+    +'<span class="dot '+st.dot+'"></span> '+st.label
+    +' · '+p.doneCount+'/'+p.totalLetters+' حرف · 🌍'+p.worldsDone.length
+    +'</div>'
+    +'<button class="detail-btn" onclick="openProgressModal(\''+code+'\')">📊 التفاصيل</button>';
+  wrap.appendChild(row);
+  var barBg=document.createElement('div');barBg.className='prog-bar-bg';
+  var barFg=document.createElement('div');barFg.className='prog-bar-fg';barFg.style.width=pct+'%';
+  barBg.appendChild(barFg);
+  wrap.appendChild(barBg);
+  return wrap;
+}
+
+function openProgressModal(code){
+  var modal=document.getElementById('progress-modal');
+  var body=document.getElementById('pm-body');
+  document.getElementById('pm-title').textContent='📊 تقدّم الكود: '+code;
+  modal.classList.add('show');
+  var p=parseProgressFields(PROGRESS_CACHE[code]);
+  if(!p){
+    body.innerHTML='<div class="empty-note">لا توجد بيانات تقدّم لهذا الكود حتى الآن — الطفل لم يفتح التطبيق أو لم يُفعّله بعد.</div>';
+    return;
+  }
+  var st=activityStatus(p.lastActive);
+  var html='';
+  html+='<div style="display:flex;align-items:center;gap:6px;font-size:.85rem;color:#94a3b8;margin-bottom:6px"><span class="dot '+st.dot+'"></span>'+st.label+(p.lastActive?' · آخر استخدام: '+new Date(p.lastActive).toLocaleString('ar'):'')+'</div>';
+  html+='<div class="stat-row">'
+    +'<div class="stat-box"><div class="v">'+p.doneCount+'/'+p.totalLetters+'</div><div class="l">حروف متقَنة</div></div>'
+    +'<div class="stat-box"><div class="v">'+p.stars+'</div><div class="l">⭐ نجوم</div></div>'
+    +'<div class="stat-box"><div class="v">'+p.gems+'</div><div class="l">💎 جواهر</div></div>'
+    +'</div>';
+  /* خريطة العوالم */
+  html+='<div style="margin:12px 0 6px;font-size:.8rem;color:#94a3b8">العوالم:</div><div>';
+  WORLD_ORDER.forEach(function(wid,ix){
+    var wn=ALL_LETTERS.find(function(l){return l.wid===wid}).wn;
+    var done=p.worldsDone.indexOf(ix)>=0;
+    html+='<span class="world-chip'+(done?' wc-done':'')+'">'+(done?'✓ ':'')+wn+'</span>';
+  });
+  html+='</div>';
+  /* خريطة الحروف */
+  html+='<div style="margin:14px 0 4px;font-size:.8rem;color:#94a3b8">خريطة الحروف (أخضر = متقَن):</div>';
+  html+='<div class="letter-grid">';
+  ALL_LETTERS.forEach(function(l){
+    var isDone=p.done.indexOf(l.id)>=0;
+    var missCount=p.letterMiss[l.ar]||0;
+    var cls=isDone?'lc-done':(missCount>0?'lc-miss':'lc-todo');
+    html+='<div class="letter-cell '+cls+'" title="'+l.nm+'">'+l.ar+'</div>';
+  });
+  html+='</div>';
+  /* أكثر الحروف تعثراً */
+  var missEntries=[];
+  for(var k in p.letterMiss){missEntries.push({ar:k,count:p.letterMiss[k]})}
+  missEntries.sort(function(a,b){return b.count-a.count});
+  if(missEntries.length){
+    html+='<div style="margin:14px 0 4px;font-size:.8rem;color:#94a3b8">⚠️ أكثر الحروف التي تحتاج مراجعة:</div>';
+    missEntries.slice(0,5).forEach(function(m){
+      var letterInfo=ALL_LETTERS.find(function(l){return l.ar===m.ar});
+      html+='<div class="miss-item"><span>'+(letterInfo?letterInfo.em+' '+letterInfo.nm:m.ar)+'</span><span style="color:#fca5a5">'+m.count+' محاولة خاطئة</span></div>';
+    });
+  }
+  /* توصية تلقائية بسيطة */
+  var advice='';
+  if(!p.lastActive){
+    advice='لم يبدأ اللعب بعد — جرّبي تذكير العائلة بالتفعيل.';
+  }else{
+    var days=(Date.now()-new Date(p.lastActive).getTime())/86400000;
+    if(days>=14){advice='⏸️ لم يلعب الطفل منذ '+Math.floor(days)+' يوماً — يُفضّل التواصل مع العائلة.';}
+    else if(missEntries.length&&missEntries[0].count>=4){advice='📌 حرف '+(ALL_LETTERS.find(function(l){return l.ar===missEntries[0].ar})||{}).nm+' يحتاج مراجعة إضافية — تكرر الخطأ فيه '+missEntries[0].count+' مرات.';}
+    else if(p.doneCount===p.totalLetters){advice='🎉 أكمل الطفل جميع الحروف! إنجاز رائع.';}
+    else{advice='✅ التقدّم طبيعي ومستمر.';}
+  }
+  html+='<div style="margin-top:14px;padding:10px;background:#0f172a;border-radius:10px;font-size:.82rem;color:#FFD93D">'+advice+'</div>';
+  body.innerHTML=html;
+}
+
+function closeProgressModal(){
+  document.getElementById('progress-modal').classList.remove('show');
+}
+
+function toggleCode(code,currentActive){
+  var user=auth.currentUser;
+  if(!user){alert('سجلي الدخول أولاً');return}
+  var newActive=!currentActive;
+  user.getIdToken().then(function(idToken){
+    return fetch('https://firestore.googleapis.com/v1/projects/'+CONFIG.project+'/databases/(default)/documents/codes/'+code+'?updateMask.fieldPaths=active',{
+      method:'PATCH',
+      headers:{'Content-Type':'application/json','Authorization':'Bearer '+idToken},
+      body:JSON.stringify({fields:{active:{booleanValue:newActive}}})
+    });
+  })
+  .then(function(){log((newActive?'تفعيل':'إيقاف')+' الكود: '+code);loadCodes()})
+  .catch(function(e){log('✗ خطأ: '+e.message)});
+}
+</script>
+</body>
+</html>
