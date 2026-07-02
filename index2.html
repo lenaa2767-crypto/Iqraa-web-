@@ -1,0 +1,1008 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>اقرأ مع لينا — لوحة المتابعة</title>
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&family=Inter:wght@600;700;800;900&display=swap" rel="stylesheet">
+<style>
+:root{
+ --sky:#18C5C9; --skyD:#0FA3A6; --skyL:#E6FBFB;
+ --green:#12B76A; --greenD:#0B8A50;
+ --yellow:#FDB022; --yellowD:#C97D0E;
+ --pink:#7A5AF8; --pinkD:#5C3FD1;
+ --ink:#1D2939; --ink2:#667085; --ink3:#98A2B3;
+ --bg:#F8FAFC; --card:#FFFFFF;
+ --red:#F04438; --redD:#C0291E;
+ --radius:24px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Cairo',Tahoma,sans-serif;background:var(--bg);color:var(--ink);min-height:100vh}
+h1,h2,h3{font-weight:800}
+.wrap{max-width:1180px;margin:0 auto;padding:28px 24px}
+input,select,textarea{font-family:'Cairo',sans-serif}
+button{font-family:'Cairo',sans-serif}
+.num{font-family:'Inter','Cairo',sans-serif}
+
+#login-screen{max-width:380px;margin:90px auto 0;padding:0 20px}
+.login-card{background:var(--card);border-radius:24px;padding:36px 28px;box-shadow:0 10px 40px rgba(43,143,191,.15);text-align:center}
+.login-logo{width:60px;height:60px;border-radius:18px;background:linear-gradient(140deg,var(--sky),var(--skyD));display:flex;align-items:center;justify-content:center;font-size:1.8rem;margin:0 auto 14px;box-shadow:0 8px 20px rgba(43,143,191,.35)}
+.login-title{font-size:1.25rem;color:var(--ink);margin-bottom:4px}
+.login-sub{font-size:.82rem;color:var(--ink2);margin-bottom:26px}
+input,select{width:100%;background:var(--bg);border:2px solid transparent;border-radius:14px;padding:13px 16px;color:var(--ink);font-size:.92rem;margin-bottom:12px;outline:none;transition:border-color .15s}
+input:focus,select:focus{border-color:var(--sky)}
+.btn{border:none;border-radius:14px;padding:14px 20px;font-size:.92rem;font-weight:800;cursor:pointer;width:100%;margin-bottom:8px;transition:transform .1s,opacity .15s}
+.btn:active{transform:scale(.97)}
+.btn:disabled{opacity:.5;cursor:not-allowed}
+.btn-primary{background:var(--sky);color:#fff;box-shadow:0 4px 14px rgba(111,205,239,.4)}
+.btn-green{background:var(--green);color:#fff;box-shadow:0 4px 14px rgba(143,217,110,.4)}
+.btn-yellow{background:var(--yellow);color:var(--ink)}
+.btn-red{background:var(--red);color:#fff}
+.btn-pink{background:var(--pink);color:#fff}
+.btn-ghost{background:var(--bg);color:var(--skyD)}
+.btn-outline{background:#fff;color:var(--ink);border:2px solid var(--bg)}
+.btn-sm{padding:9px 16px;font-size:.8rem;width:auto;border-radius:11px}
+.err{color:var(--redD);font-size:.82rem;margin-bottom:8px;min-height:18px;text-align:center}
+
+#app-screen{display:none}
+.topbar{display:flex;justify-content:space-between;align-items:center;margin-bottom:24px}
+.brand{display:flex;align-items:center;gap:12px}
+.brand-mark{width:42px;height:42px;border-radius:13px;background:linear-gradient(140deg,var(--sky),var(--skyD));display:flex;align-items:center;justify-content:center;font-size:1.3rem;box-shadow:0 6px 16px rgba(43,143,191,.35);flex-shrink:0}
+.brand-text{display:flex;flex-direction:column;line-height:1.15}
+.brand-text b{font-size:1.05rem;color:var(--ink)}
+.brand-text span{font-size:.72rem;color:var(--ink2);font-weight:600}
+.topbar-right{display:flex;align-items:center;gap:8px}
+.user-chip{font-size:.78rem;color:var(--ink2);background:var(--card);padding:9px 16px;border-radius:99px;display:flex;align-items:center;gap:8px;box-shadow:0 2px 10px rgba(31,36,48,.06)}
+.user-chip .dot{width:7px;height:7px;border-radius:50%;background:var(--green)}
+.logout-btn{background:none;border:none;color:var(--ink2);font-size:.78rem;cursor:pointer;font-weight:700;padding:9px 14px;border-radius:99px}
+.logout-btn:hover{background:var(--card)}
+
+.stats-band{background:var(--card);border-radius:var(--radius);padding:6px;box-shadow:0 4px 20px rgba(31,36,48,.06);display:grid;grid-template-columns:repeat(6,1fr);margin-bottom:24px;overflow:hidden}
+.stat-cell{padding:20px 14px;text-align:center;position:relative}
+.stat-cell:not(:last-child)::after{content:'';position:absolute;left:0;top:18%;bottom:18%;width:1px;background:var(--bg)}
+.stat-v{font-family:'Inter','Cairo',sans-serif;font-size:1.6rem;font-weight:900;color:var(--ink);line-height:1}
+.stat-l{font-size:.7rem;color:var(--ink2);margin-top:6px;font-weight:700}
+.stat-cell.hi-green .stat-v{color:var(--greenD)}
+.stat-cell.hi-yellow .stat-v{color:var(--yellowD)}
+.stat-cell.hi-red .stat-v{color:var(--redD)}
+
+.card{background:var(--card);border-radius:var(--radius);padding:24px;margin-bottom:20px;box-shadow:0 4px 20px rgba(31,36,48,.06)}
+.card-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:18px;flex-wrap:wrap;gap:10px}
+.card-title{font-size:1.05rem;color:var(--ink);display:flex;align-items:center;gap:9px;font-weight:800}
+.card-title .ic{width:34px;height:34px;border-radius:11px;background:var(--skyL);display:flex;align-items:center;justify-content:center;font-size:1rem;flex-shrink:0}
+
+.filters{display:flex;gap:10px;margin-bottom:18px;flex-wrap:wrap}
+.filters select,.filters input{margin-bottom:0;background:var(--bg)}
+.filters input{flex:1;min-width:160px}
+.filters select{min-width:130px;width:auto}
+
+.table-wrap{overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-size:.86rem;min-width:680px}
+th{text-align:right;color:var(--ink2);font-weight:700;padding:0 12px 12px;font-size:.72rem;text-transform:uppercase;letter-spacing:.03em;white-space:nowrap}
+td{padding:13px 12px;border-top:1px solid var(--bg);white-space:nowrap}
+.child-cell{display:flex;align-items:center;gap:10px}
+.avatar-mini{width:38px;height:38px;border-radius:50%;background:linear-gradient(140deg,var(--skyL),#fff);display:flex;align-items:center;justify-content:center;font-size:1.1rem;flex-shrink:0;box-shadow:inset 0 0 0 2px var(--skyL);overflow:hidden}
+.avatar-mini img{width:100%;height:100%;object-fit:cover}
+.child-name{font-weight:800;color:var(--ink)}
+.child-age{font-size:.7rem;color:var(--ink2)}
+
+.status-pill{display:inline-flex;align-items:center;gap:5px;border-radius:99px;padding:5px 12px;font-size:.72rem;font-weight:800;border:none;cursor:pointer}
+.status-pill .d{width:6px;height:6px;border-radius:50%}
+.status-trial{background:#FFF6DD;color:var(--yellowD)}.status-trial .d{background:var(--yellowD)}
+.status-active{background:#EAF8E3;color:var(--greenD)}.status-active .d{background:var(--greenD)}
+.status-expired{background:#FFEADD;color:#C9722B}.status-expired .d{background:#C9722B}
+.status-blocked{background:#FFE7E5;color:var(--redD)}.status-blocked .d{background:var(--redD)}
+
+.progress-cell{display:flex;align-items:center;gap:8px}
+.mini-bar-bg{background:var(--bg);border-radius:99px;height:6px;width:64px;overflow:hidden;flex-shrink:0}
+.mini-bar-fg{height:100%;border-radius:99px;background:linear-gradient(90deg,var(--sky),var(--green))}
+.progress-txt{font-size:.74rem;color:var(--ink2);font-weight:700;white-space:nowrap}
+
+.action-icons{display:flex;gap:5px;justify-content:flex-end}
+.icon-btn{background:var(--bg);border:none;border-radius:9px;width:32px;height:32px;cursor:pointer;font-size:.9rem;display:flex;align-items:center;justify-content:center}
+.icon-btn:hover{background:var(--skyL)}
+.icon-btn.danger:hover{background:#FFE7E5}
+.empty-note{color:var(--ink2);text-align:center;padding:40px 20px;font-size:.88rem}
+.empty-note .em{font-size:2.2rem;display:block;margin-bottom:10px}
+
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(31,36,48,.5);z-index:999;padding:16px;overflow-y:auto}
+.modal-overlay.show{display:block}
+.modal-box{background:var(--card);border-radius:24px;padding:0;max-width:820px;margin:20px auto;box-shadow:0 20px 60px rgba(0,0,0,.2);overflow:hidden;position:relative}
+.modal-close{position:absolute;left:18px;top:18px;background:rgba(255,255,255,.95);border:none;color:var(--ink);border-radius:50%;width:34px;height:34px;cursor:pointer;font-size:1rem;z-index:5;box-shadow:0 2px 8px rgba(0,0,0,.1)}
+
+.profile-hero{background:linear-gradient(135deg,var(--skyL),#fff);padding:32px 28px 24px;display:flex;align-items:center;gap:18px;flex-wrap:wrap}
+.profile-avatar{width:74px;height:74px;border-radius:50%;background:#fff;display:flex;align-items:center;justify-content:center;font-size:2rem;box-shadow:0 6px 18px rgba(43,143,191,.25);flex-shrink:0;overflow:hidden;position:relative}
+.profile-avatar img{width:100%;height:100%;object-fit:cover}
+.avatar-upload-btn{position:absolute;bottom:-2px;left:-2px;width:26px;height:26px;border-radius:50%;background:var(--sky);color:#fff;border:none;font-size:.75rem;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 6px rgba(0,0,0,.2)}
+.profile-name{font-size:1.3rem;color:var(--ink);font-weight:900}
+.profile-meta{font-size:.82rem;color:var(--ink2);margin-top:3px}
+.profile-body{padding:24px 28px;max-height:72vh;overflow-y:auto}
+.profile-section{margin-bottom:24px}
+.profile-section-title{font-size:.92rem;font-weight:800;color:var(--ink);margin-bottom:12px;display:flex;align-items:center;gap:7px}
+.kv-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px}
+.kv-box{background:var(--bg);border-radius:14px;padding:12px 14px}
+.kv-box .k{font-size:.7rem;color:var(--ink2);font-weight:700;margin-bottom:4px}
+.kv-box .v{font-size:.92rem;color:var(--ink);font-weight:800}
+.status-select-row{display:flex;gap:10px;flex-wrap:wrap}
+.status-select-row select{width:auto;flex:1;min-width:150px}
+.letter-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:7px}
+.letter-cell{aspect-ratio:1;border-radius:11px;display:flex;flex-direction:column;align-items:center;justify-content:center;font-size:1.05rem;font-weight:800;border:2px solid transparent}
+.letter-cell.lc-mastered{background:#EAF8E3;color:var(--greenD);border-color:#C9EBB8}
+.letter-cell.lc-learning{background:#FFF6DD;color:var(--yellowD);border-color:#FBE7A8}
+.letter-cell.lc-new{background:var(--bg);color:var(--ink3)}
+.chart-box{background:var(--bg);border-radius:14px;padding:16px;margin-bottom:12px}
+.session-item{display:flex;justify-content:space-between;background:var(--bg);border-radius:11px;padding:10px 14px;margin-bottom:6px;font-size:.82rem}
+.session-item .t{color:var(--ink2)}
+#toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:var(--ink);color:#fff;padding:12px 22px;border-radius:14px;font-size:.85rem;opacity:0;transition:opacity .25s;z-index:1100;pointer-events:none}
+#toast.show{opacity:1}
+
+@media (max-width:680px){
+ .stats-band{grid-template-columns:repeat(3,1fr)}
+ .stat-cell:nth-child(3n)::after{display:none}
+ th,td{font-size:.78rem;padding:10px 8px}
+ .letter-grid{grid-template-columns:repeat(5,1fr)}
+}
+</style>
+</head>
+<body>
+
+<div id="login-screen">
+  <div class="login-card">
+    <div class="login-logo">📖</div>
+    <div class="login-title">اقرأ مع لينا</div>
+    <div class="login-sub">لوحة متابعة الدفعة التجريبية</div>
+    <input id="login-email" placeholder="البريد الإلكتروني" type="email" autocomplete="username"/>
+    <input id="login-pass" placeholder="كلمة السر" type="password" autocomplete="current-password"/>
+    <div class="err" id="login-err"></div>
+    <button class="btn btn-primary" onclick="doLogin()">دخول</button>
+  </div>
+</div>
+
+<div id="app-screen">
+<div class="wrap">
+  <div class="topbar">
+    <div class="brand">
+      <div class="brand-mark">📖</div>
+      <div class="brand-text"><b>اقرأ مع لينا</b><span>لوحة المتابعة — تجريبي</span></div>
+    </div>
+    <div class="topbar-right">
+      <div class="user-chip"><span class="dot"></span><span id="user-email"></span></div>
+      <button class="logout-btn" onclick="doLogout()">خروج ←</button>
+    </div>
+  </div>
+
+  <div class="stats-band" id="stats-band" style="grid-template-columns:repeat(8,1fr)">
+    <div class="stat-cell"><div class="stat-v" id="st-total">—</div><div class="stat-l">👶 عدد الأطفال</div></div>
+    <div class="stat-cell hi-green"><div class="stat-v" id="st-active">—</div><div class="stat-l">🟢 نشط</div></div>
+    <div class="stat-cell hi-yellow"><div class="stat-v" id="st-trial">—</div><div class="stat-l">🟡 تجريبي</div></div>
+    <div class="stat-cell hi-red"><div class="stat-v" id="st-expired">—</div><div class="stat-l">🔴 منتهي</div></div>
+    <div class="stat-cell hi-red"><div class="stat-v" id="st-blocked">—</div><div class="stat-l">🚫 محظور</div></div>
+    <div class="stat-cell"><div class="stat-v" id="st-progress">—</div><div class="stat-l">📈 متوسط التقدّم</div></div>
+    <div class="stat-cell"><div class="stat-v" id="st-stars">—</div><div class="stat-l">⭐ إجمالي النجوم</div></div>
+    <div class="stat-cell"><div class="stat-v" id="st-gems">—</div><div class="stat-l">💎 إجمالي الجواهر</div></div>
+  </div>
+
+  <div class="stats-band" id="visitor-stats-band" style="grid-template-columns:repeat(4,1fr);margin-bottom:24px">
+    <div class="stat-cell"><div class="stat-v" id="vs-total">—</div><div class="stat-l">🔗 فتحوا الرابط (أول+عودة)</div></div>
+    <div class="stat-cell"><div class="stat-v" id="vs-started">—</div><div class="stat-l">🆕 فتحوه أول مرة</div></div>
+    <div class="stat-cell hi-green"><div class="stat-v" id="vs-completed">—</div><div class="stat-l">▶️ بدأوا التعلّم فعليًا</div></div>
+    <div class="stat-cell"><div class="stat-v" id="vs-returned">—</div><div class="stat-l">🔁 عادوا مرة ثانية</div></div>
+  </div>
+  <div class="card" style="margin-bottom:24px">
+    <div class="card-head"><div class="card-title"><span class="ic">📊</span> نشاط فتح الرابط - آخر 7 أيام</div></div>
+    <div id="visitor-chart" style="display:flex;align-items:flex-end;gap:8px;height:140px;padding:10px 4px"></div>
+  </div>
+  <div style="display:none">
+    <div class="stat-cell"><div class="stat-v" id="st-dau">—</div><div class="stat-l">نشط اليوم</div></div>
+    <div class="stat-cell"><div class="stat-v" id="st-letters">—</div><div class="stat-l">حروف مكتملة</div></div>
+  </div>
+
+  <div class="card">
+    <div class="card-head"><div class="card-title"><span class="ic">➕</span> إضافة طفل جديد</div></div>
+    <div class="kv-grid" style="margin-bottom:4px">
+      <input id="new-parent-name" placeholder="اسم الوالد/ة"/>
+      <input id="new-child-name" placeholder="اسم الطفل"/>
+      <input id="new-child-age" type="number" min="3" max="8" placeholder="عمر الطفل"/>
+      <input id="new-whatsapp" placeholder="رقم واتساب"/>
+      <input id="new-parent-email" placeholder="بريد إلكتروني (اختياري)"/>
+      <input id="new-cohort" placeholder="الدفعة (مثل: مال الشام - دفعة 1)"/>
+    </div>
+    <button class="btn btn-primary" style="margin-top:10px" onclick="createCode()">⚡ إنشاء كود التفعيل</button>
+    <div id="new-code-result" style="display:none;margin-top:14px;text-align:center;background:var(--skyL);border-radius:14px;padding:16px">
+      <div style="color:var(--ink2);font-size:.8rem;margin-bottom:8px">كود التفعيل الجديد</div>
+      <div style="display:flex;justify-content:center;gap:10px;align-items:center">
+        <span id="new-code-display" style="font-family:monospace;font-size:1.4rem;font-weight:900;color:var(--skyD);letter-spacing:.1em;background:#fff;padding:8px 18px;border-radius:10px"></span>
+        <button class="btn btn-ghost btn-sm" onclick="copyCode()">نسخ</button>
+      </div>
+      <button class="btn btn-green btn-sm" style="margin-top:12px" onclick="sendWhatsApp()">💬 إرسال عبر واتساب</button>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-head"><div class="card-title"><span class="ic">👨‍👩‍👧</span> الأطفال المسجَّلون</div></div>
+    <div class="filters">
+      <input id="f-search" placeholder="بحث باسم الطفل أو الوالد..." oninput="renderTable()"/>
+      <select id="f-cohort" onchange="renderTable()"><option value="">كل الدفعات</option></select>
+      <select id="f-status" onchange="renderTable()">
+        <option value="">كل الحالات</option>
+        <option value="trial">تجريبي</option>
+        <option value="active">نشط</option>
+        <option value="expired">منتهي</option>
+        <option value="blocked">محظور</option>
+      </select>
+    </div>
+    <div class="table-wrap" id="table-wrap">
+      <div class="empty-note"><span class="em">⏳</span>اضغطي تحديث لتحميل قائمة الأطفال</div>
+    </div>
+    <button class="btn btn-ghost btn-sm" style="margin-top:14px" onclick="loadAllCodes()">🔄 تحديث القائمة</button>
+  </div>
+
+  <div class="card">
+    <div class="card-head"><div class="card-title"><span class="ic">👣</span> سجل الزوار (كل من فتح الرابط)</div></div>
+    <div class="filters">
+      <select id="vi-kind-filter" onchange="renderVisitorEvents()">
+        <option value="">كل الأحداث</option>
+        <option value="openedApp">فتح أول مرة</option>
+        <option value="returnedAgain">عودة على نفس الجهاز</option>
+        <option value="startedLearning">بدأ التعلّم فعليًا</option>
+        <option value="completedFirstLetter">أكمل أول حرف</option>
+        <option value="completedTenLetters">أكمل 10 أحرف</option>
+        <option value="sessionEnd">انتهت جلسة</option>
+      </select>
+    </div>
+    <div class="table-wrap" id="visitor-table-wrap">
+      <div class="empty-note"><span class="em">⏳</span>اضغطي تحديث لتحميل سجل الزوار</div>
+    </div>
+    <button class="btn btn-ghost btn-sm" style="margin-top:14px" onclick="loadVisitorEvents()">🔄 تحديث السجل</button>
+  </div>
+</div>
+</div>
+
+<div class="modal-overlay" id="profile-modal">
+  <div class="modal-box">
+    <button class="modal-close" onclick="closeProfileModal()">✕</button>
+    <div id="profile-content"><div class="empty-note">جاري التحميل...</div></div>
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<!-- Firebase SDK (compat) -->
+<script src="https://www.gstatic.com/firebasejs/10.13.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.13.1/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.13.1/firebase-storage-compat.js"></script>
+<script>
+var firebaseConfig={
+  apiKey:"AIzaSyAuht0nBKwwIjmLcKRa4loK_KzODB7UWpQ",
+  authDomain:"iqraa-app-7fbe5.firebaseapp.com",
+  projectId:"iqraa-app-7fbe5",
+  storageBucket:"iqraa-app-7fbe5.appspot.com"
+};
+firebase.initializeApp(firebaseConfig);
+var auth=firebase.auth();
+var storage=firebase.storage();
+var CONFIG={key:'AIzaSyAuht0nBKwwIjmLcKRa4loK_KzODB7UWpQ',project:'iqraa-app-7fbe5'};
+var FS_BASE='https://firestore.googleapis.com/v1/projects/'+CONFIG.project+'/databases/(default)/documents';
+
+/* ═══ قائمة الحروف الكاملة (35 حرفاً، 8 عوالم) - بلا تغيير عن النسخة السابقة ═══ */
+var ALL_LETTERS=[
+ {wid:'garden',wn:'حديقة البدايات',id:'alef',ar:'ا',nm:'ألف',em:'🦁'},
+ {wid:'garden',wn:'حديقة البدايات',id:'lam',ar:'ل',nm:'لام',em:'🍋'},
+ {wid:'garden',wn:'حديقة البدايات',id:'meem',ar:'م',nm:'ميم',em:'🍌'},
+ {wid:'garden',wn:'حديقة البدايات',id:'ba',ar:'ب',nm:'باء',em:'🦆'},
+ {wid:'garden',wn:'حديقة البدايات',id:'noon',ar:'ن',nm:'نون',em:'🐝'},
+ {wid:'arcs',wn:'جزيرة الأقواس',id:'ta',ar:'ت',nm:'تاء',em:'🍎'},
+ {wid:'arcs',wn:'جزيرة الأقواس',id:'tha',ar:'ث',nm:'ثاء',em:'🦊'},
+ {wid:'arcs',wn:'جزيرة الأقواس',id:'ya',ar:'ي',nm:'ياء',em:'🖐️'},
+ {wid:'arcs',wn:'جزيرة الأقواس',id:'kaf',ar:'ك',nm:'كاف',em:'🐕'},
+ {wid:'arcs',wn:'جزيرة الأقواس',id:'fa',ar:'ف',nm:'فاء',em:'🦋'},
+ {wid:'beach',wn:'شاطئ الأسنان',id:'seen',ar:'س',nm:'سين',em:'🐟'},
+ {wid:'beach',wn:'شاطئ الأسنان',id:'sheen',ar:'ش',nm:'شين',em:'🌞'},
+ {wid:'beach',wn:'شاطئ الأسنان',id:'sad',ar:'ص',nm:'صاد',em:'🍚'},
+ {wid:'beach',wn:'شاطئ الأسنان',id:'dad',ar:'ض',nm:'ضاد',em:'🌿'},
+ {wid:'valley',wn:'وادي المنعطفات',id:'ra',ar:'ر',nm:'راء',em:'🌹'},
+ {wid:'valley',wn:'وادي المنعطفات',id:'zay',ar:'ز',nm:'زاي',em:'🌷'},
+ {wid:'valley',wn:'وادي المنعطفات',id:'dal',ar:'د',nm:'دال',em:'🐻'},
+ {wid:'valley',wn:'وادي المنعطفات',id:'thal',ar:'ذ',nm:'ذال',em:'🐺'},
+ {wid:'valley',wn:'وادي المنعطفات',id:'waw',ar:'و',nm:'واو',em:'🌹'},
+ {wid:'city',wn:'مدينة الحلقات',id:'jeem',ar:'ج',nm:'جيم',em:'🐫'},
+ {wid:'city',wn:'مدينة الحلقات',id:'ha',ar:'ح',nm:'حاء',em:'🐴'},
+ {wid:'city',wn:'مدينة الحلقات',id:'kha',ar:'خ',nm:'خاء',em:'🥒'},
+ {wid:'city',wn:'مدينة الحلقات',id:'heh',ar:'ه',nm:'هاء',em:'🏠'},
+ {wid:'city',wn:'مدينة الحلقات',id:'ta_marb',ar:'ة',nm:'تاء مربوطة',em:'🌺'},
+ {wid:'castle',wn:'قلعة الحروف الذهبية',id:'ayn',ar:'ع',nm:'عين',em:'🐦'},
+ {wid:'castle',wn:'قلعة الحروف الذهبية',id:'ghayn',ar:'غ',nm:'غين',em:'🐅'},
+ {wid:'castle',wn:'قلعة الحروف الذهبية',id:'qaf',ar:'ق',nm:'قاف',em:'🐱'},
+ {wid:'castle',wn:'قلعة الحروف الذهبية',id:'ta2',ar:'ط',nm:'طاء',em:'💚'},
+ {wid:'castle',wn:'قلعة الحروف الذهبية',id:'dha',ar:'ظ',nm:'ظاء',em:'🦌'},
+ {wid:'sky',wn:'سماء النجوم',id:'hamza',ar:'ء',nm:'همزة',em:'🛸'},
+ {wid:'sky',wn:'سماء النجوم',id:'alef_maqsura',ar:'ى',nm:'ألف مقصورة',em:'🔑'},
+ {wid:'hamzat',wn:'مملكة الهمزات',id:'alef_hamza_above',ar:'أ',nm:'ألف بهمزة فوق',em:'🦁'},
+ {wid:'hamzat',wn:'مملكة الهمزات',id:'alef_hamza_below',ar:'إ',nm:'ألف بهمزة تحت',em:'🐘'},
+ {wid:'hamzat',wn:'مملكة الهمزات',id:'waw_hamza',ar:'ؤ',nm:'واو بهمزة',em:'🪞'},
+ {wid:'hamzat',wn:'مملكة الهمزات',id:'ya_hamza',ar:'ئ',nm:'ياء بهمزة',em:'📖'}
+];
+var WORLD_ORDER=['garden','arcs','beach','valley','city','castle','sky','hamzat'];
+
+var ALL_CODES=[];      /* كل وثائق codes/{code} بعد الجلب */
+var PROGRESS_BY_CODE={}; /* تقدّم كل كود، مفتاح = code */
+var CURRENT_PROFILE_CODE=null;
+
+function toast(msg){
+ var t=document.getElementById('toast');
+ t.textContent=msg;t.classList.add('show');
+ setTimeout(function(){t.classList.remove('show')},2400);
+}
+
+/* ═══ تسجيل الدخول/الخروج ═══ */
+function doLogin(){
+  var email=document.getElementById('login-email').value.trim();
+  var pass=document.getElementById('login-pass').value;
+  var errEl=document.getElementById('login-err');
+  errEl.textContent='';
+  if(!email||!pass){errEl.textContent='أدخلي البريد وكلمة السر';return}
+  auth.signInWithEmailAndPassword(email,pass)
+    .catch(function(e){
+      errEl.textContent=e.code==='auth/invalid-credential'||e.code==='auth/wrong-password'||e.code==='auth/user-not-found'
+        ?'البريد أو كلمة السر غير صحيحة'
+        :'خطأ: '+e.message;
+    });
+}
+function doLogout(){auth.signOut()}
+
+auth.onAuthStateChanged(function(user){
+  if(user){
+    document.getElementById('login-screen').style.display='none';
+    document.getElementById('app-screen').style.display='block';
+    document.getElementById('user-email').textContent=user.email;
+    loadAllCodes();
+    loadVisitorEvents();
+  }else{
+    document.getElementById('login-screen').style.display='block';
+    document.getElementById('app-screen').style.display='none';
+  }
+});
+
+/* ═══ توليد كود جديد (6 خانات، أحرف+أرقام) ═══ */
+function genCode(){
+  var chars='ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+  var out='';
+  for(var i=0;i<6;i++)out+=chars[Math.floor(Math.random()*chars.length)];
+  return out;
+}
+
+/* ═══ إنشاء كود جديد بكل الحقول الموسَّعة ═══ */
+function createCode(){
+  var user=auth.currentUser;
+  if(!user){toast('سجّلي الدخول أولاً');return}
+  var parentName=document.getElementById('new-parent-name').value.trim();
+  var childName=document.getElementById('new-child-name').value.trim();
+  var childAge=parseInt(document.getElementById('new-child-age').value,10)||0;
+  var whatsapp=document.getElementById('new-whatsapp').value.trim();
+  var parentEmail=document.getElementById('new-parent-email').value.trim();
+  var cohort=document.getElementById('new-cohort').value.trim();
+  if(!childName){toast('أدخلي اسم الطفل على الأقل');return}
+  var code=genCode();
+
+  user.getIdToken().then(function(idToken){
+    var body=JSON.stringify({fields:{
+      code:{stringValue:code},
+      status:{stringValue:'trial'},
+      paymentStatus:{stringValue:'unpaid'},
+      courseStatus:{stringValue:'waiting'},
+      parentName:{stringValue:parentName},
+      childName:{stringValue:childName},
+      childAge:{integerValue:childAge},
+      whatsappNumber:{stringValue:whatsapp},
+      parentEmail:{stringValue:parentEmail},
+      cohort:{stringValue:cohort},
+      enrollmentDate:{stringValue:new Date().toISOString()},
+      created:{stringValue:new Date().toISOString()},
+      active:{booleanValue:true},
+      products:{arrayValue:{values:[{stringValue:'iqra_kg1'}]}}
+    }});
+    return fetch(FS_BASE+'/codes/'+code,{
+      method:'PATCH',
+      headers:{'Content-Type':'application/json','Authorization':'Bearer '+idToken},
+      body:body
+    });
+  })
+  .then(function(r){return r.json()})
+  .then(function(data){
+    if(data.name){
+      document.getElementById('new-code-display').textContent=code;
+      document.getElementById('new-code-result').style.display='block';
+      document.getElementById('new-code-result').dataset.code=code;
+      document.getElementById('new-code-result').dataset.whatsapp=whatsapp;
+      document.getElementById('new-code-result').dataset.childname=childName;
+      ['new-parent-name','new-child-name','new-child-age','new-whatsapp','new-parent-email','new-cohort'].forEach(function(id){document.getElementById(id).value=''});
+      toast('تم إنشاء الكود بنجاح');
+      loadAllCodes();
+    }else{
+      toast('حدث خطأ، حاولي مجدداً');
+    }
+  })
+  .catch(function(){toast('تعذّر الاتصال بالإنترنت')});
+}
+function copyCode(){
+  var code=document.getElementById('new-code-result').dataset.code;
+  if(navigator.clipboard)navigator.clipboard.writeText(code);
+  toast('تم نسخ الكود');
+}
+function sendWhatsApp(){
+  var box=document.getElementById('new-code-result');
+  var code=box.dataset.code,wn=box.dataset.whatsapp,childName=box.dataset.childname;
+  var msg='مرحباً! كود تفعيل تطبيق اقرأ مع لينا لطفلكم '+childName+' هو: '+code;
+  var url='https://wa.me/'+(wn||'').replace(/[^0-9]/g,'')+'?text='+encodeURIComponent(msg);
+  window.open(url,'_blank');
+}
+
+/* ═══ جلب كل الأكواد دفعة واحدة ═══ */
+/* ═══ سجل الزوار (visitors) - كل من فتح الرابط، سواء أكمل التسجيل أو لأ ═══ */
+var ALL_VISITOR_EVENTS=[];
+function loadVisitorEvents(){
+  var user=auth.currentUser;
+  if(!user)return;
+  document.getElementById('visitor-table-wrap').innerHTML='<div class="empty-note"><span class="em">⏳</span>جاري التحميل...</div>';
+  user.getIdToken().then(function(idToken){
+    return fetch(FS_BASE+'/visitors?pageSize=500',{headers:{'Authorization':'Bearer '+idToken}});
+  })
+  .then(function(r){return r.json()})
+  .then(function(data){
+    var docs=data.documents||[];
+    ALL_VISITOR_EVENTS=docs.map(function(d){return parseVisitorDoc(d)});
+    ALL_VISITOR_EVENTS.sort(function(a,b){return (b.timestamp||'').localeCompare(a.timestamp||'')});
+    renderVisitorFunnel();
+    renderVisitorChart();
+    renderVisitorEvents();
+  })
+  .catch(function(){toast('تعذّر تحميل سجل الزوار')});
+}
+function parseVisitorDoc(doc){
+  var f=doc.fields||{};
+  return{
+    kind:f.kind&&f.kind.stringValue||'',
+    code:f.code&&f.code.stringValue||'',
+    userAgent:f.userAgent&&f.userAgent.stringValue||'',
+    deviceType:f.deviceType&&f.deviceType.stringValue||'',
+    referrer:f.referrer&&f.referrer.stringValue||'',
+    visitorId:f.visitorId&&f.visitorId.stringValue||'',
+    durationSec:parseInt(f.durationSec&&f.durationSec.integerValue,10)||0,
+    timestamp:f.timestamp&&f.timestamp.stringValue||''
+  };
+}
+var VISITOR_KIND_LABELS={
+  openedApp:{t:'فتح التطبيق أول مرة',col:'var(--skyD)',bg:'var(--skyL)'},
+  returnedAgain:{t:'عودة على نفس الجهاز',col:'var(--ink2)',bg:'var(--bg)'},
+  startedLearning:{t:'بدأ التعلّم فعليًا',col:'var(--greenD)',bg:'#E6F7EE'},
+  completedFirstLetter:{t:'أكمل أول حرف',col:'var(--yellowD)',bg:'#FFF6E6'},
+  completedTenLetters:{t:'أكمل 10 أحرف',col:'var(--pinkD)',bg:'#F1ECFF'},
+  sessionEnd:{t:'انتهت جلسة لعب',col:'var(--ink2)',bg:'var(--bg)'}
+};
+/* ═══ قمع الزوار: فتحوا الرابط / بدأوا التعلّم فعليًا / عادوا مرة ثانية ═══ */
+function renderVisitorFunnel(){
+  var totalOpens=ALL_VISITOR_EVENTS.filter(function(e){return e.kind==='openedApp'||e.kind==='returnedAgain'}).length;
+  var opened=ALL_VISITOR_EVENTS.filter(function(e){return e.kind==='openedApp'}).length;
+  var started=ALL_VISITOR_EVENTS.filter(function(e){return e.kind==='startedLearning'}).length;
+  var returns=ALL_VISITOR_EVENTS.filter(function(e){return e.kind==='returnedAgain'}).length;
+  document.getElementById('vs-total').textContent=totalOpens;
+  document.getElementById('vs-started').textContent=opened;
+  document.getElementById('vs-completed').textContent=started;
+  document.getElementById('vs-returned').textContent=returns;
+}
+/* ═══ رسم بياني بسيط (CSS bars) لعدد مرات فتح الرابط بآخر 7 أيام ═══ */
+function renderVisitorChart(){
+  var days=[];
+  for(var i=6;i>=0;i--){
+    var d=new Date();d.setDate(d.getDate()-i);
+    days.push({key:d.toISOString().slice(0,10),label:d.toLocaleDateString('ar-EG',{weekday:'short'}),count:0});
+  }
+  ALL_VISITOR_EVENTS.forEach(function(e){
+    if(!e.timestamp)return;
+    var key=e.timestamp.slice(0,10);
+    var day=days.find(function(x){return x.key===key});
+    if(day)day.count++;
+  });
+  var max=Math.max.apply(null,days.map(function(d){return d.count})) || 1;
+  var html='';
+  days.forEach(function(d){
+    var h=Math.round((d.count/max)*100);
+    html+='<div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;height:100%;gap:6px">'
+      +'<div class="num" style="font-size:.72rem;font-weight:800;color:var(--ink2)">'+d.count+'</div>'
+      +'<div style="width:100%;max-width:32px;height:'+Math.max(h,4)+'%;background:linear-gradient(180deg,var(--sky),var(--skyD));border-radius:8px 8px 0 0"></div>'
+      +'<div style="font-size:.68rem;color:var(--ink2)">'+d.label+'</div>'
+      +'</div>';
+  });
+  document.getElementById('visitor-chart').innerHTML=html;
+}
+function renderVisitorEvents(){
+  var kindFilter=document.getElementById('vi-kind-filter').value;
+  var rows=ALL_VISITOR_EVENTS.filter(function(e){
+    if(kindFilter&&e.kind!==kindFilter)return false;
+    return true;
+  }).slice(0,150);
+  var wrap=document.getElementById('visitor-table-wrap');
+  if(!rows.length){wrap.innerHTML='<div class="empty-note"><span class="em">📭</span>ما في زوار مطابقين</div>';return}
+  var html='<table><thead><tr><th>الوقت</th><th>الحدث</th><th>الكود</th></tr></thead><tbody>';
+  rows.forEach(function(e){
+    var lab=VISITOR_KIND_LABELS[e.kind]||{t:e.kind,col:'var(--ink2)',bg:'var(--bg)'};
+    var dt=e.timestamp?new Date(e.timestamp).toLocaleString('ar-EG'):'—';
+    html+='<tr><td>'+dt+'</td>'
+      +'<td><span style="display:inline-flex;border-radius:99px;padding:5px 12px;font-size:.72rem;font-weight:800;color:'+lab.col+';background:'+lab.bg+'">'+lab.t+'</span></td>'
+      +'<td style="color:var(--ink2);font-size:.8rem">'+escapeHtml(e.code||'—')+'</td></tr>';
+  });
+  html+='</tbody></table>';
+  wrap.innerHTML=html;
+}
+
+function loadAllCodes(){
+  var user=auth.currentUser;
+  if(!user)return;
+  document.getElementById('table-wrap').innerHTML='<div class="empty-note"><span class="em">⏳</span>جاري التحميل...</div>';
+  user.getIdToken().then(function(idToken){
+    return fetch(FS_BASE+'/codes?pageSize=300',{headers:{'Authorization':'Bearer '+idToken}});
+  })
+  .then(function(r){return r.json()})
+  .then(function(data){
+    var docs=data.documents||[];
+    ALL_CODES=docs.map(function(d){return parseCodeDoc(d)}).filter(function(c){return c.childName});
+    populateCohortFilter();
+    renderStats();
+    renderTable();
+    loadProgressForAllCodes();
+  })
+  .catch(function(){toast('تعذّر تحميل القائمة')});
+}
+
+/* ═══ تحويل وثيقة Firestore الخام لكائن JS بسيط ═══ */
+function parseCodeDoc(doc){
+  var f=doc.fields||{};
+  var code=f.code&&f.code.stringValue||doc.name.split('/').pop();
+  var status=f.status&&f.status.stringValue;
+  if(!status){
+    var legacyActive=f.active&&f.active.booleanValue===true;
+    status=legacyActive?'active':'blocked';
+  }
+  return{
+    code:code,
+    status:status,
+    paymentStatus:f.paymentStatus&&f.paymentStatus.stringValue||'unpaid',
+    courseStatus:f.courseStatus&&f.courseStatus.stringValue||'waiting',
+    parentName:f.parentName&&f.parentName.stringValue||'',
+    childName:f.childName&&f.childName.stringValue||'',
+    childAge:f.childAge&&parseInt(f.childAge.integerValue,10)||0,
+    whatsappNumber:f.whatsappNumber&&f.whatsappNumber.stringValue||f.phone&&f.phone.stringValue||'',
+    parentEmail:f.parentEmail&&f.parentEmail.stringValue||'',
+    cohort:f.cohort&&f.cohort.stringValue||'',
+    enrollmentDate:f.enrollmentDate&&f.enrollmentDate.stringValue||f.created&&f.created.stringValue||'',
+    avatarUrl:f.avatarUrl&&f.avatarUrl.stringValue||''
+  };
+}
+
+/* ═══ تصحيح الخلل المعماري: جلب التقدّم بـrunQuery على حقل code الداخلي،
+   لا بجلب مباشر بمفتاح=code (لأن التطبيق يحفظ فعلياً بمفتاح=USER_UID) ═══ */
+function fetchProgressByCode(code,idToken){
+  var query={
+    structuredQuery:{
+      from:[{collectionId:'progress'}],
+      where:{fieldFilter:{field:{fieldPath:'code'},op:'EQUAL',value:{stringValue:code}}},
+      limit:1
+    }
+  };
+  return fetch(FS_BASE+':runQuery',{
+    method:'POST',
+    headers:{'Content-Type':'application/json','Authorization':'Bearer '+idToken},
+    body:JSON.stringify(query)
+  }).then(function(r){return r.json()});
+}
+
+/* ═══ جلب تقدّم كل الأكواد دفعة واحدة (بالتتابع، لا فيض من الطلبات المتزامنة) ═══ */
+function loadProgressForAllCodes(){
+  var user=auth.currentUser;
+  if(!user)return;
+  user.getIdToken().then(function(idToken){
+    var chain=Promise.resolve();
+    ALL_CODES.forEach(function(c){
+      chain=chain.then(function(){
+        return fetchProgressByCode(c.code,idToken).then(function(results){
+          var match=(results||[]).find(function(r){return r.document});
+          if(match){
+            PROGRESS_BY_CODE[c.code]=parseProgressDoc(match.document);
+          }
+        }).catch(function(){});
+      });
+    });
+    return chain;
+  }).then(function(){
+    renderStats();
+    renderTable();
+  });
+}
+
+/* ═══ تحويل وثيقة progress الخام لكائن JS بسيط ═══ */
+function parseProgressDoc(doc){
+  var f=doc.fields||{};
+  var done=(f.done&&f.done.arrayValue&&f.done.arrayValue.values||[]).map(function(v){return v.stringValue});
+  var letterStateFields=(f.letterState&&f.letterState.mapValue&&f.letterState.mapValue.fields)||{};
+  var letterState={};
+  for(var lid in letterStateFields){
+    if(!letterStateFields.hasOwnProperty(lid))continue;
+    var lf=letterStateFields[lid].mapValue.fields;
+    letterState[lid]={
+      masteryState:lf.masteryState&&lf.masteryState.stringValue||'new',
+      attempts:parseInt(lf.attempts&&lf.attempts.integerValue,10)||0,
+      successes:parseInt(lf.successes&&lf.successes.integerValue,10)||0,
+      reviewStage:parseInt(lf.reviewStage&&lf.reviewStage.integerValue,10)||0,
+      nextReviewDue:parseInt(lf.nextReviewDue&&lf.nextReviewDue.integerValue,10)||0
+    };
+  }
+  return{
+    stars:parseInt(f.stars&&f.stars.integerValue,10)||0,
+    gems:parseInt(f.gems&&f.gems.integerValue,10)||0,
+    worldIx:parseInt(f.worldIx&&f.worldIx.integerValue,10)||0,
+    doneCount:parseInt(f.doneCount&&f.doneCount.integerValue,10)||done.length,
+    done:done,
+    letterState:letterState,
+    lastActive:f.lastActive&&f.lastActive.stringValue||''
+  };
+}
+
+var TOTAL_LETTERS=35;
+
+/* ═══ هل آخر نشاط كان اليوم؟ (للإحصائية "نشط اليوم") ═══ */
+function wasActiveToday(lastActiveISO){
+  if(!lastActiveISO)return false;
+  var d=new Date(lastActiveISO);
+  var now=new Date();
+  return d.getFullYear()===now.getFullYear()&&d.getMonth()===now.getMonth()&&d.getDate()===now.getDate();
+}
+
+/* ═══ حساب وعرض الإحصائيات العامة ═══ */
+function renderStats(){
+  var total=ALL_CODES.length;
+  var active=0,trial=0,expired=0,blocked=0,dau=0,totalLettersCompleted=0,totalStars=0,totalGems=0;
+  ALL_CODES.forEach(function(c){
+    if(c.status==='active')active++;
+    if(c.status==='trial')trial++;
+    if(c.status==='expired')expired++;
+    if(c.status==='blocked')blocked++;
+    var p=PROGRESS_BY_CODE[c.code];
+    if(p){
+      if(wasActiveToday(p.lastActive))dau++;
+      totalLettersCompleted+=p.doneCount||0;
+      totalStars+=p.stars||0;
+      totalGems+=p.gems||0;
+    }
+  });
+  var avgProgress=total?Math.round((totalLettersCompleted/(total*TOTAL_LETTERS))*100):0;
+  document.getElementById('st-total').textContent=total;
+  document.getElementById('st-active').textContent=active;
+  document.getElementById('st-trial').textContent=trial;
+  document.getElementById('st-expired').textContent=expired;
+  document.getElementById('st-blocked').textContent=blocked;
+  document.getElementById('st-progress').textContent=avgProgress+'%';
+  document.getElementById('st-stars').textContent=totalStars;
+  document.getElementById('st-gems').textContent=totalGems;
+  document.getElementById('st-dau').textContent=dau;
+  document.getElementById('st-letters').textContent=totalLettersCompleted;
+}
+
+/* ═══ تعبئة قائمة فلتر الدفعات من الأكواد الفعلية الموجودة ═══ */
+function populateCohortFilter(){
+  var sel=document.getElementById('f-cohort');
+  var current=sel.value;
+  var cohorts=Array.from(new Set(ALL_CODES.map(function(c){return c.cohort}).filter(Boolean))).sort();
+  sel.innerHTML='<option value="">كل الدفعات</option>'+cohorts.map(function(c){return '<option value="'+escapeAttr(c)+'">'+escapeHtml(c)+'</option>'}).join('');
+  sel.value=current;
+}
+function escapeHtml(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')}
+function escapeAttr(s){return String(s).replace(/"/g,'&quot;')}
+
+var STATUS_LABELS={trial:'تجريبي',active:'نشط',expired:'منتهي',blocked:'محظور'};
+
+/* ═══ تنسيق "منذ كم" لآخر نشاط ═══ */
+function timeAgo(iso){
+  if(!iso)return 'لا يوجد نشاط';
+  var diff=Date.now()-new Date(iso).getTime();
+  var days=Math.floor(diff/86400000);
+  if(days===0)return 'اليوم';
+  if(days===1)return 'منذ يوم';
+  if(days<7)return 'منذ '+days+' أيام';
+  if(days<30)return 'منذ '+Math.floor(days/7)+' أسبوع';
+  return 'منذ '+Math.floor(days/30)+' شهر';
+}
+
+/* ═══ بناء جدول الأطفال مع الفلاتر الحالية ═══ */
+function renderTable(){
+  var search=(document.getElementById('f-search').value||'').trim().toLowerCase();
+  var cohortFilter=document.getElementById('f-cohort').value;
+  var statusFilter=document.getElementById('f-status').value;
+
+  var filtered=ALL_CODES.filter(function(c){
+    if(cohortFilter&&c.cohort!==cohortFilter)return false;
+    if(statusFilter&&c.status!==statusFilter)return false;
+    if(search){
+      var hay=(c.childName+' '+c.parentName).toLowerCase();
+      if(hay.indexOf(search)===-1)return false;
+    }
+    return true;
+  });
+
+  var wrap=document.getElementById('table-wrap');
+  if(filtered.length===0){
+    wrap.innerHTML='<div class="empty-note"><span class="em">🔍</span>لا يوجد أطفال مطابقون للبحث/الفلتر</div>';
+    return;
+  }
+
+  var rows=filtered.map(function(c){
+    var p=PROGRESS_BY_CODE[c.code];
+    var doneCount=p?p.doneCount:0;
+    var pct=Math.round((doneCount/TOTAL_LETTERS)*100);
+    var avatarInner=c.avatarUrl?'<img src="'+escapeAttr(c.avatarUrl)+'" alt=""/>':(c.childAge<6?'👧':'🧒');
+    return '<tr>'
+      +'<td><div class="child-cell"><div class="avatar-mini">'+avatarInner+'</div><div><div class="child-name">'+escapeHtml(c.childName)+'</div><div class="child-age">'+(c.childAge?c.childAge+' سنوات':'')+'</div></div></div></td>'
+      +'<td>'+escapeHtml(c.parentName||'—')+'</td>'
+      +'<td><span class="status-pill status-'+c.status+'"><span class="d"></span>'+STATUS_LABELS[c.status]+'</span></td>'
+      +'<td><div class="progress-cell"><span class="mini-bar-bg"><span class="mini-bar-fg" style="width:'+pct+'%"></span></span><span class="progress-txt">'+doneCount+'/'+TOTAL_LETTERS+'</span></div></td>'
+      +'<td style="color:var(--ink2);font-size:.8rem">'+(p?timeAgo(p.lastActive):'لم يبدأ بعد')+'</td>'
+      +'<td><div class="action-icons">'
+      +'<button class="icon-btn" title="عرض الملف" onclick="openProfileModal(\''+c.code+'\')">👁️</button>'
+      +'<button class="icon-btn" title="تفعيل" onclick="quickSetStatus(\''+c.code+'\',\'active\')">✅</button>'
+      +'<button class="icon-btn danger" title="حظر" onclick="quickSetStatus(\''+c.code+'\',\'blocked\')">🚫</button>'
+      +'</div></td>'
+      +'</tr>';
+  }).join('');
+
+  wrap.innerHTML='<table><tr><th>الطفل</th><th>الوالد</th><th>الحالة</th><th>التقدّم</th><th>آخر نشاط</th><th></th></tr>'+rows+'</table>';
+}
+
+/* ═══ تغيير سريع للحالة من الجدول مباشرة (بلا فتح الملف الكامل) ═══ */
+function quickSetStatus(code,newStatus){
+  var user=auth.currentUser;
+  if(!user)return;
+  if(newStatus==='blocked'&&!confirm('هل تريدين حظر هذا الحساب فعلاً؟'))return;
+  user.getIdToken().then(function(idToken){
+    return fetch(FS_BASE+'/codes/'+code+'?updateMask.fieldPaths=status',{
+      method:'PATCH',
+      headers:{'Content-Type':'application/json','Authorization':'Bearer '+idToken},
+      body:JSON.stringify({fields:{status:{stringValue:newStatus}}})
+    });
+  }).then(function(){
+    var c=ALL_CODES.find(function(x){return x.code===code});
+    if(c)c.status=newStatus;
+    renderStats();renderTable();
+    toast('تم تحديث الحالة إلى: '+STATUS_LABELS[newStatus]);
+  }).catch(function(){toast('تعذّر تحديث الحالة')});
+}
+
+/* ═══ فتح ملف الطفل التفصيلي ═══ */
+function openProfileModal(code){
+  CURRENT_PROFILE_CODE=code;
+  var c=ALL_CODES.find(function(x){return x.code===code});
+  if(!c){toast('لم يُعثَر على الطفل');return}
+  var p=PROGRESS_BY_CODE[code]||{stars:0,gems:0,doneCount:0,done:[],letterState:{},lastActive:''};
+  document.getElementById('profile-content').innerHTML=buildProfileHtml(c,p);
+  document.getElementById('profile-modal').classList.add('show');
+}
+function closeProfileModal(){
+  document.getElementById('profile-modal').classList.remove('show');
+  CURRENT_PROFILE_CODE=null;
+}
+
+/* ═══ بناء شبكة الحروف الـ35 الملوَّنة بحسب حالة الإتقان الفعلية ═══ */
+function buildLetterGrid(letterState){
+  return ALL_LETTERS.map(function(l){
+    var st=letterState[l.id];
+    var cls='lc-new';
+    if(st){
+      if(st.masteryState==='mastered_full'||st.masteryState==='mastered_initial')cls='lc-mastered';
+      else if(st.masteryState==='learning')cls='lc-learning';
+    }
+    return '<div class="letter-cell '+cls+'" title="'+escapeAttr(l.nm)+'">'+l.ar+'</div>';
+  }).join('');
+}
+
+/* ═══ توزيع مراحل المراجعة الفعلية (0-3) لرسم بياني واقعي بالبيانات المتاحة ═══ */
+function reviewStageDistribution(letterState){
+  var dist=[0,0,0,0];
+  for(var id in letterState){
+    if(!letterState.hasOwnProperty(id))continue;
+    var stage=letterState[id].reviewStage||0;
+    if(stage>=0&&stage<=3)dist[stage]++;
+  }
+  return dist;
+}
+
+/* ═══ بناء HTML كامل لصفحة الطفل ═══ */
+function buildProfileHtml(c,p){
+  var pct=Math.round(((p.doneCount||0)/TOTAL_LETTERS)*100);
+  var dist=reviewStageDistribution(p.letterState);
+  var maxDist=Math.max.apply(null,dist.concat([1]));
+  var avatarInner=c.avatarUrl?'<img src="'+escapeAttr(c.avatarUrl)+'" alt=""/>':(c.childAge<6?'👧':'🧒');
+
+  var html='<div class="profile-hero">'
+    +'<div class="profile-avatar">'+avatarInner
+    +'<button class="avatar-upload-btn" onclick="document.getElementById(\'avatar-file-input\').click()" title="رفع صورة">📷</button>'
+    +'</div>'
+    +'<div><div class="profile-name">'+escapeHtml(c.childName)+'</div>'
+    +'<div class="profile-meta">'+(c.childAge?c.childAge+' سنوات':'')+' · الوالد: '+escapeHtml(c.parentName||'—')+'</div>'
+    +'<div class="profile-meta">الكود: <strong>'+c.code+'</strong>'+(c.cohort?' · '+escapeHtml(c.cohort):'')+'</div>'
+    +'</div></div>'
+    +'<input type="file" id="avatar-file-input" accept="image/*" style="display:none" onchange="handleAvatarUpload(this)"/>'
+    +'<div class="profile-body">'
+
+    +'<div class="profile-section">'
+    +'<div class="profile-section-title">⚙️ إدارة الحساب</div>'
+    +'<div class="status-select-row">'
+    +'<select id="pm-status" onchange="updateFullStatus()">'
+    +['trial','active','expired','blocked'].map(function(s){return '<option value="'+s+'"'+(c.status===s?' selected':'')+'>'+STATUS_LABELS[s]+'</option>'}).join('')
+    +'</select>'
+    +'<select id="pm-course-status" onchange="updateFullStatus()">'
+    +['waiting','enrolled','active','completed'].map(function(s){
+      var labels={waiting:'بالانتظار',enrolled:'مسجَّل',active:'نشط بالدورة',completed:'أنهى الدورة'};
+      return '<option value="'+s+'"'+(c.courseStatus===s?' selected':'')+'>'+labels[s]+'</option>';
+    }).join('')
+    +'</select>'
+    +'<select id="pm-payment-status" onchange="updateFullStatus()">'
+    +['unpaid','paid','scholarship'].map(function(s){
+      var labels={unpaid:'لم يُدفَع',paid:'مدفوع',scholarship:'منحة'};
+      return '<option value="'+s+'"'+(c.paymentStatus===s?' selected':'')+'>'+labels[s]+'</option>';
+    }).join('')
+    +'</select>'
+    +'</div>'
+    +'</div>'
+
+    +'<div class="profile-section">'
+    +'<div class="profile-section-title">📋 معلومات الطفل</div>'
+    +'<div class="kv-grid">'
+    +'<div class="kv-box"><div class="k">واتساب</div><div class="v">'+escapeHtml(c.whatsappNumber||'—')+'</div></div>'
+    +'<div class="kv-box"><div class="k">البريد</div><div class="v">'+escapeHtml(c.parentEmail||'—')+'</div></div>'
+    +'<div class="kv-box"><div class="k">تاريخ التسجيل</div><div class="v">'+(c.enrollmentDate?new Date(c.enrollmentDate).toLocaleDateString('ar-EG'):'—')+'</div></div>'
+    +'<div class="kv-box"><div class="k">آخر نشاط</div><div class="v">'+timeAgo(p.lastActive)+'</div></div>'
+    +'</div></div>'
+
+    +'<div class="profile-section">'
+    +'<div class="profile-section-title">📊 التقدّم العام — '+(p.doneCount||0)+'/'+TOTAL_LETTERS+' حرفاً ('+pct+'%)</div>'
+    +'<div class="chart-box"><div class="mini-bar-bg" style="width:100%;height:14px"><div class="mini-bar-fg" style="width:'+pct+'%;height:100%"></div></div></div>'
+    +'<div class="kv-grid">'
+    +'<div class="kv-box"><div class="k">⭐ النجوم</div><div class="v">'+(p.stars||0)+'</div></div>'
+    +'<div class="kv-box"><div class="k">💎 الجواهر</div><div class="v">'+(p.gems||0)+'</div></div>'
+    +'<div class="kv-box"><div class="k">🌍 العالم الحالي</div><div class="v">'+(WORLD_ORDER[p.worldIx]?worldNameById(WORLD_ORDER[p.worldIx]):'—')+'</div></div>'
+    +'</div></div>'
+
+    +'<div class="profile-section">'
+    +'<div class="profile-section-title">🔤 الحروف الـ35 — أخضر=مُتقَن، أصفر=قيد التعلّم، رمادي=لم يبدأ</div>'
+    +'<div class="letter-grid">'+buildLetterGrid(p.letterState)+'</div>'
+    +'</div>'
+
+    +buildPracticalStatsSection(c,p)
+
+    +'<div class="profile-section">'
+    +'<div class="profile-section-title">🔁 توزيع مراحل المراجعة (Spaced Repetition)</div>'
+    +'<div class="chart-box"><div style="display:flex;align-items:flex-end;gap:10px;height:90px">'
+    +dist.map(function(v,i){
+      var h=Math.round((v/maxDist)*80)+8;
+      return '<div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:4px">'
+        +'<div style="font-size:.72rem;color:var(--ink2);font-weight:800">'+v+'</div>'
+        +'<div style="width:100%;height:'+h+'px;background:linear-gradient(180deg,var(--sky),var(--skyD));border-radius:6px 6px 0 0"></div>'
+        +'<div style="font-size:.68rem;color:var(--ink2)">مرحلة '+i+'</div>'
+        +'</div>';
+    }).join('')
+    +'</div></div></div>'
+
+    +'</div>'; /* profile-body */
+  return html;
+}
+/* ═══ إحصائيات عملية بدل Activity Timeline اللحظي: محاولات/أخطاء/نسبة نجاح من letterState الفعلي،
+   وجلسات/وقت لعب من سجل visitors المفلتر بنفس الكود (تقريبي إذا شاركت أكثر من طفل نفس الكود) ═══ */
+function buildPracticalStatsSection(c,p){
+  var totalAttempts=0,totalSuccesses=0;
+  for(var lid in (p.letterState||{})){
+    if(!p.letterState.hasOwnProperty(lid))continue;
+    totalAttempts+=p.letterState[lid].attempts||0;
+    totalSuccesses+=p.letterState[lid].successes||0;
+  }
+  var totalMistakes=Math.max(0,totalAttempts-totalSuccesses);
+  var successRate=totalAttempts?Math.round((totalSuccesses/totalAttempts)*100):0;
+  var codeEvents=(typeof ALL_VISITOR_EVENTS!=='undefined'?ALL_VISITOR_EVENTS:[]).filter(function(e){return e.code===c.code});
+  var sessionEvents=codeEvents.filter(function(e){return e.kind==='sessionEnd'});
+  var sessionCount=sessionEvents.length;
+  var totalPlaySec=sessionEvents.reduce(function(s,e){return s+(e.durationSec||0)},0);
+  var avgSessionMin=sessionCount?Math.round((totalPlaySec/sessionCount)/60):0;
+  var totalPlayMin=Math.round(totalPlaySec/60);
+  var lastLetterApprox=lastLetterLearnedApprox(p.letterState);
+  return '<div class="profile-section">'
+    +'<div class="profile-section-title">📊 إحصائيات عملية</div>'
+    +'<div class="kv-grid">'
+    +'<div class="kv-box"><div class="k">🎯 عدد المحاولات</div><div class="v">'+totalAttempts+'</div></div>'
+    +'<div class="kv-box"><div class="k">✅ عدد النجاحات</div><div class="v">'+totalSuccesses+'</div></div>'
+    +'<div class="kv-box"><div class="k">❌ عدد الأخطاء (تقريبي)</div><div class="v">'+totalMistakes+'</div></div>'
+    +'<div class="kv-box"><div class="k">📈 نسبة النجاح</div><div class="v">'+successRate+'%</div></div>'
+    +'<div class="kv-box"><div class="k">🕐 عدد الجلسات المسجَّلة</div><div class="v">'+sessionCount+'</div></div>'
+    +'<div class="kv-box"><div class="k">⏱️ متوسط مدة الجلسة</div><div class="v">'+avgSessionMin+' د</div></div>'
+    +'<div class="kv-box"><div class="k">⏱️ إجمالي وقت اللعب</div><div class="v">'+totalPlayMin+' د</div></div>'
+    +'<div class="kv-box"><div class="k">🔤 آخر حرف تعلّمه (تقريبي)</div><div class="v">'+escapeHtml(lastLetterApprox)+'</div></div>'
+    +'</div>'
+    +'<div style="font-size:.72rem;color:var(--ink3);margin-top:8px">ملاحظة: الجلسات/الوقت مرتبطة بكود العائلة؛ إذا شارك أكثر من طفل نفس الكود، هذي الأرقام مجمّعة للكل مش لطفل واحد بالتحديد.</div>'
+    +'</div>';
+}
+/* تقريب "آخر حرف تعلّمه": أعلى قيمة nextReviewDue بين الحروف المُتقَنة (الأحدث جدولة مراجعة غالبًا = الأحدث إتقانًا) -
+   هذا تقريب فقط، لأن محرك الإتقان لا يسجّل حاليًا توقيت إتمام كل حرف بدقة (لتفادي أي لمس لمنطق المحرك). */
+function lastLetterLearnedApprox(letterState){
+  var best=null,bestVal=-1;
+  for(var lid in (letterState||{})){
+    if(!letterState.hasOwnProperty(lid))continue;
+    var st=letterState[lid];
+    if(st.masteryState==='mastered'&&(st.nextReviewDue||0)>bestVal){bestVal=st.nextReviewDue||0;best=lid}
+  }
+  if(!best)return '—';
+  var l=ALL_LETTERS.find(function(x){return x.id===best});
+  return l?(l.nm+' ('+l.ar+')'):best;
+}
+
+function worldNameById(wid){
+  var l=ALL_LETTERS.find(function(x){return x.wid===wid});
+  return l?l.wn:wid;
+}
+
+/* ═══ تحديث الحالات الثلاثة معاً من صفحة الطفل ═══ */
+function updateFullStatus(){
+  var code=CURRENT_PROFILE_CODE;
+  if(!code)return;
+  var status=document.getElementById('pm-status').value;
+  var courseStatus=document.getElementById('pm-course-status').value;
+  var paymentStatus=document.getElementById('pm-payment-status').value;
+  var user=auth.currentUser;
+  if(!user)return;
+  user.getIdToken().then(function(idToken){
+    return fetch(FS_BASE+'/codes/'+code+'?updateMask.fieldPaths=status&updateMask.fieldPaths=courseStatus&updateMask.fieldPaths=paymentStatus',{
+      method:'PATCH',
+      headers:{'Content-Type':'application/json','Authorization':'Bearer '+idToken},
+      body:JSON.stringify({fields:{
+        status:{stringValue:status},
+        courseStatus:{stringValue:courseStatus},
+        paymentStatus:{stringValue:paymentStatus}
+      }})
+    });
+  }).then(function(){
+    var c=ALL_CODES.find(function(x){return x.code===code});
+    if(c){c.status=status;c.courseStatus=courseStatus;c.paymentStatus=paymentStatus}
+    renderStats();renderTable();
+    toast('تم حفظ التحديثات');
+  }).catch(function(){toast('تعذّر الحفظ')});
+}
+
+/* ═══ رفع صورة الطفل إلى Firebase Storage ═══ */
+function handleAvatarUpload(input){
+  var file=input.files&&input.files[0];
+  if(!file)return;
+  var code=CURRENT_PROFILE_CODE;
+  if(!code)return;
+  if(file.size>3*1024*1024){toast('حجم الصورة كبير جداً (الحد 3 ميغابايت)');return}
+  toast('جاري رفع الصورة...');
+  var ref=storage.ref('avatars/'+code+'.jpg');
+  ref.put(file).then(function(){
+    return ref.getDownloadURL();
+  }).then(function(url){
+    var user=auth.currentUser;
+    return user.getIdToken().then(function(idToken){
+      return fetch(FS_BASE+'/codes/'+code+'?updateMask.fieldPaths=avatarUrl',{
+        method:'PATCH',
+        headers:{'Content-Type':'application/json','Authorization':'Bearer '+idToken},
+        body:JSON.stringify({fields:{avatarUrl:{stringValue:url}}})
+      });
+    }).then(function(){return url});
+  }).then(function(url){
+    var c=ALL_CODES.find(function(x){return x.code===code});
+    if(c)c.avatarUrl=url;
+    toast('تم رفع الصورة بنجاح');
+    openProfileModal(code); /* إعادة رسم الملف بالصورة الجديدة */
+    renderTable();
+  }).catch(function(e){
+    if(e&&e.code==='storage/unknown'){toast('تأكدي من تفعيل Firebase Storage بالمشروع')}
+    else{toast('تعذّر رفع الصورة')}
+  });
+}
+</script>
+</body>
+</html>
